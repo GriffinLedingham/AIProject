@@ -9,40 +9,17 @@ public class KernelPerceptron {
 	private int max_iterations;
 
 	public boolean debug = false;
-
-	public static void main(String[] args)
-	{
-		KernelPerceptron kernelPerceptron = new KernelPerceptron();
-		
-		kernelPerceptron.runPerceptron(args);
-
-		return;
-	}
 	
-	public void runPerceptron(String[] args)
+	public float runPerceptron(String filename, int max_itterations, int dimesion)
 	{
-		String filename = null;
 		int dimension = 0;
+		float testError;
 		
 		/* usage: java KernelPerceptron <inputfile> <max iterations> <kernel dimension>
 		 * <input file> txt file with number of samples as first line and every line following contains two ints, <x,y>
 		 * <max iterations> is the number of iterations the program should perform before giving up on classifying the samples
 		 * <kernel dimension> is the dimension mapped to
 		 */
-		if( args.length != 3)
-		{
-			System.out.println("usage: java KernelPerceptron <inputfile> <max iterations> <kernel dimension>\n" +
-					" <input file> txt file with number of samples as first line and every line following contains two ints, <x,y> \n" +
-					" <max iterations> is the number of iterations the program should perform before giving up on classifying the samples\n " +
-					" <kernel dimension> is the dimension mapped to");
-		}
-
-		//If no filename specified, use the default filename
-		try{
-			filename = args[0];
-		} catch(ArrayIndexOutOfBoundsException e){
-			filename = "in.txt";
-		}
 		
 		// read in the samples
 		File infile = new File(filename);
@@ -55,25 +32,24 @@ public class KernelPerceptron {
 			e.printStackTrace();
 		}
 		
-
-		// other logistical stuff
-		//If no cmd line args are specified then it uses default values
-		try {
-			max_iterations = Integer.parseInt(args[1]);
-			dimension = Integer.parseInt(args[2]);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			max_iterations = 10;
-			dimension = 2;
-		}
-
-		
 		// compute the kernel matrix
 		computeKernel(dimension);
 
 		int[] c = classify();
 		
 		printClassification(c);
-
+		
+		testError = testError();
+		
+		return testError;
+	}
+	
+	private float testError()
+	{
+		float error = 0;
+		//TODO
+		
+		return error;
 	}
 
 	private void parseInput(Scanner in)
