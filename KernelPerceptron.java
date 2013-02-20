@@ -1,18 +1,29 @@
 import java.io.*;
-import java.lang.Math.*;
 import java.util.*;
 
 public class KernelPerceptron {
-	static int[] x;
-	static int[] y;
-	static int[][] K;
-	static int num_samples;
-	static int max_iterations;
+	private int[] x;
+	private int[] y;
+	private int[][] K;
+	private int num_samples;
+	private int max_iterations;
 
-	static boolean debug = false;
+	public boolean debug = false;
 
 	public static void main(String[] args)
 	{
+		KernelPerceptron kernelPerceptron = new KernelPerceptron();
+		
+		kernelPerceptron.runPerceptron(args);
+
+		return;
+	}
+	
+	public void runPerceptron(String[] args)
+	{
+		String filename = null;
+		int dimension = 0;
+		
 		/* usage: java KernelPerceptron <inputfile> <max iterations> <kernel dimension>
 		 * <input file> txt file with number of samples as first line and every line following contains two ints, <x,y>
 		 * <max iterations> is the number of iterations the program should perform before giving up on classifying the samples
@@ -26,8 +37,15 @@ public class KernelPerceptron {
 					" <kernel dimension> is the dimension mapped to");
 		}
 
+		//If no filename specified, use the default filename
+		try{
+			filename = args[0];
+		} catch(ArrayIndexOutOfBoundsException e){
+			filename = "in.txt";
+		}
+		
 		// read in the samples
-		File infile = new File(args[0]);
+		File infile = new File(filename);
 		Scanner in;
 		try {
 			in = new Scanner(infile);
@@ -39,18 +57,26 @@ public class KernelPerceptron {
 		
 
 		// other logistical stuff
-		max_iterations = Integer.parseInt(args[1]);
-		int dimension = Integer.parseInt(args[2]);
+		//If no cmd line args are specified then it uses default values
+		try {
+			max_iterations = Integer.parseInt(args[1]);
+			dimension = Integer.parseInt(args[2]);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			max_iterations = 10;
+			dimension = 2;
+		}
 
+		
 		// compute the kernel matrix
 		computeKernel(dimension);
 
 		int[] c = classify();
-
+		
+		printClassification(c);
 
 	}
 
-	public static void parseInput(Scanner in)
+	private void parseInput(Scanner in)
 	{
 		num_samples = in.nextInt();
 		x = new int[num_samples];
@@ -64,7 +90,7 @@ public class KernelPerceptron {
 		}
 	}
 
-	public static void computeKernel(int dimension)
+	private void computeKernel(int dimension)
 	{
 		if(debug) System.out.println("Kernel Matrix");
 		K = new int[num_samples][num_samples];
@@ -79,10 +105,21 @@ public class KernelPerceptron {
 		}
 
 	}
-
-	public static int[] classify()
+	
+	private void printClassification(int[] classifcation)
 	{
-		int i, j, k;
+		int i;
+		System.out.print("c = ");
+		for(i = 0; i < num_samples; i++)
+		{
+			System.out.print(classifcation[i] + " ");
+		}
+		System.out.println();
+	}
+
+	private int[] classify()
+	{
+		int j, k;
 		int sum;
 		int count = 0;
 
@@ -115,15 +152,7 @@ public class KernelPerceptron {
 
 		}
 
-		System.out.println();
-		if(misclassified) System.out.println("did not converge after " + max_iterations + "  iterations");
-		System.out.print("c = ");
-		for(i = 0; i < num_samples; i++)
-		{
-			System.out.print(c[i] + " ");
-		}
-		System.out.println();
-		
+		System.out.println();		
 		
 		return c;
 	}
