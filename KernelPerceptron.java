@@ -6,13 +6,11 @@ public class KernelPerceptron {
 	private int[] y;
 	private int[][] K;
 	private int num_samples;
-	private int max_iterations;
 
 	public boolean debug = false;
 	
-	public float runPerceptron(String filename, int max_itterations, int dimesion)
+	public float runPerceptron(String filename, int max_iterations, int dimension)
 	{
-		int dimension = 0;
 		float testError;
 		
 		/* usage: java KernelPerceptron <inputfile> <max iterations> <kernel dimension>
@@ -35,7 +33,7 @@ public class KernelPerceptron {
 		// compute the kernel matrix
 		computeKernel(dimension);
 
-		int[] c = classify();
+		int[] c = classify(max_iterations);
 		
 		printClassification(c);
 		
@@ -93,7 +91,7 @@ public class KernelPerceptron {
 		System.out.println();
 	}
 
-	private int[] classify()
+	private int[] classify(int max_iterations)
 	{
 		int j, k;
 		int sum;
