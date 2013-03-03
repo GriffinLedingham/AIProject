@@ -27,7 +27,8 @@ public class DecisionStumps {
 	float[][] trainingSetXY;
 	int[] classLabels;
 	float[] weights;
-	int trainingSetSize;
+	int trainingSetRowSize;
+	int trainingSetColSize;
 	
 	public void runDecisionStumps(String filename, int numIterations)
 	{
@@ -49,8 +50,8 @@ public class DecisionStumps {
 	
 	private bestStump build(int numIterations)
     {
-		int m = trainingSetSize;
-        int n = trainingSetXY[0].length;
+		int m = trainingSetRowSize;
+        int n = trainingSetColSize;
         float minErr = Float.POSITIVE_INFINITY;
         float numStep = 10.0f;
         float[] bestClassEst = new float[m];
@@ -63,12 +64,12 @@ public class DecisionStumps {
         {
             float min = trainingSetXY[0][i];
             float max = trainingSetXY[0][i];
-            for(int j=0;j<trainingSetXY.length;j++)
+            for(int j=0;j<m;j++)
             {
-                if(trainingSetXY[j][i] < min) //find min value
-                    min = trainingSetXY[j][i];
-                if(trainingSetXY[j][i] > max) //find max value
-                    max = trainingSetXY[j][i];
+                if(trainingSetXY[i][j] < min) //find min value
+                    min = trainingSetXY[i][j];
+                if(trainingSetXY[i][j] > max) //find max value
+                    max = trainingSetXY[i][j];
             }
 			float stepSize = (max-min)/numStep; //calculate step size
             for(int j=-1;j<(int)numStep+1;j++)
@@ -79,14 +80,14 @@ public class DecisionStumps {
                     if(k==0){inequal = "lt";}
                     else{inequal = "gt";}
                     
-                    float threshValue = min+j * stepSize; //calculate threshold v
+                    float threshValue = min + (float)j * stepSize; //calculate threshold v
                     float[] predictedValues = stumpClassify(i,threshValue,inequal); //predict labels
                     int[] errArray = new int[m];
-                    for(int l=0;l<m;l++) //initialize error array to all 1's
+                    for(int l=0; l<m; l++) //initialize error array to all 1's
                     {
                         errArray[l] = 1;
                     }
-                    for(int l=0;l<predictedValues.length;l++)
+                    for(int l=0; l<m; l++)
                     {
                         if(predictedValues[l] == classLabels[l]) //if predicted labels differs from real, flag a 1 in the error array
                         {
@@ -122,12 +123,18 @@ public class DecisionStumps {
     
     private float[] stumpClassify(int dimension,float threshVal, String inequal)
     {
-        float[] retArrary = new float[trainingSetXY.length];
+        float[] retArrary = new float[trainingSetRowSize];
+        //Init with all ones
+        for(int i=0;i<trainingSetRowSize;i++)
+        {
+        	retArrary[i] = 1.0f;
+        }
+        
         if(inequal == "lt")
         {
-            for(int i=0;i<trainingSetXY.length;i++)
+            for(int i=0;i<trainingSetRowSize;i++)
             {
-                if(trainingSetXY[i][dimension] <= threshVal)
+                if(trainingSetXY[dimension][i] <= threshVal)
                 {
                     retArrary[i] = -1.0f;
                 }
@@ -135,9 +142,9 @@ public class DecisionStumps {
         }
         else
         {
-            for(int i=0;i<trainingSetXY.length;i++)
+            for(int i=0;i<trainingSetRowSize;i++)
             {
-                if(trainingSetXY[i][dimension] > threshVal)
+                if(trainingSetXY[dimension][i] > threshVal)
                 {
                     retArrary[i] = 1.0f;
                 }
@@ -149,13 +156,14 @@ public class DecisionStumps {
 	private void parseInput(Scanner in)
 	{
 		int i = 0;
-		trainingSetSize = in.nextInt();
-		trainingSetXY = new float[trainingSetSize][2];
-		classLabels = new int[trainingSetSize];
+		trainingSetRowSize = in.nextInt();
+		trainingSetColSize = 2;
+		trainingSetXY = new float[2][trainingSetRowSize];
+		classLabels = new int[trainingSetRowSize];
 		
 		while(in.hasNext()){
-			trainingSetXY[i][0] = in.nextFloat();
-			trainingSetXY[i][1]	= in.nextFloat();
+			trainingSetXY[0][i] = in.nextFloat();
+			trainingSetXY[1][i]	= in.nextFloat();
 			classLabels[i] = in.nextInt();
 			
 			i++;
@@ -166,10 +174,10 @@ public class DecisionStumps {
 	
 	private void initWeights()
 	{
-		weights = new float[trainingSetSize];
-		for(int i=0; i<trainingSetSize; i++)
+		weights = new float[trainingSetRowSize];
+		for(int i=0; i<trainingSetRowSize; i++)
 		{
-			weights[i] = (float) (1.0/trainingSetSize);
+			weights[i] = (float) (1.0/trainingSetRowSize);
 		}
 	}
 }

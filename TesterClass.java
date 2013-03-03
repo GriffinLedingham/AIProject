@@ -15,7 +15,7 @@ public class TesterClass {
 	{
 		float testError;
 		//testError = kernelPerceptron.runPerceptron("in.txt", 10, 2);
-		decisionStumps.runDecisionStumps("ds.txt", 15);
+		decisionStumps.runDecisionStumps("ds.txt", 10);
 		//TODO
 	}
 	
