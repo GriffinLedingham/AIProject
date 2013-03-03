@@ -96,8 +96,9 @@ public class DecisionStumps {
                     float weightedErr = 0.0f;
                     for(int l=0;l<errArray.length;l++)
                     {
-                        weightedErr += errArray[l] * weights[l];
+                        weightedErr += weights[l] * errArray[l];
                     }
+                    System.out.println("dim: " + i + ". thresh: " + threshValue + ". ineqal: " + inequal + ". The weighted error is " + weightedErr);
                     if(weightedErr<minErr)
                     {
                         minErr = weightedErr;
@@ -110,7 +111,7 @@ public class DecisionStumps {
                      bestStump['dim'] = i
                      bestStump['thresh'] = threshVal
                      bestStump['ineq'] = inequal*/
-                    System.out.println("dim: " + i + ". thresh: " + threshValue + ". ineqal: " + inequal + ". The weighted error is " + weightedErr);
+                    
                 }
             }
 		}
