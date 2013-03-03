@@ -36,16 +36,16 @@ public class DecisionStumps {
 		
 	}
     
-    private float[] stumpClassify(float dimension,float threshVal, String inequal)
+    private float[] stumpClassify(int dimension,float threshVal, String inequal)
     {
-        float[][] retArrary = new float[trainingSetXY[0].length][1];
+        float[] retArrary = new float[trainingSetXY[0].length];
         if(inequal == "lt")
         {
             for(int i=0;i<trainingSetXY.length;i++)
             {
                 if(trainingSetXY[i][dimension] <= threshVal)
                 {
-                    retArrary[i] = -1.0;
+                    retArrary[i] = -1.0f;
                 }
             }
         }
@@ -55,7 +55,7 @@ public class DecisionStumps {
             {
                 if(trainingSetXY[i][dimension] > threshVal)
                 {
-                    retArrary[i] = 1.0;
+                    retArrary[i] = 1.0f;
                 }
             }
         }
