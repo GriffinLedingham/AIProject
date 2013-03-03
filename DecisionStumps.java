@@ -31,6 +31,7 @@ public class DecisionStumps {
 	private void build(int numIterations) {
 		int m = trainingSetSize;
         int n = trainingSetXY[0].length;
+        float minErr = Float.POSITIVE_INFINITY;
         float numStep = 10.0f;
         float[] bestClassEst = new float[m];
         for(int i=0; i<m; i++) {
@@ -62,10 +63,17 @@ public class DecisionStumps {
                             errArray[l]=0;
                         }
                     }
-                    /*weightedErr = D.T * errArr
-                     if weightedErr < minErr:
-                     minErr = weightedErr
-                     bestClasEst = predictedVals.copy()
+                    float weightedErr = 0.0f;
+                    for(int l=0;l<errArray.length;l++) {
+                        weightedErr += errArray[l] * weights[l];
+                    }
+                    if(weightedErr<minErr)
+                    {
+                        minErr = weightedErr;
+                        bestClassEst = (float[])predictedValues.clone();
+                    }
+                    
+                     /*
                      bestStump['dim'] = i
                      bestStump['thresh'] = threshVal
                      bestStump['ineq'] = inequal*/
@@ -77,16 +85,16 @@ public class DecisionStumps {
 	}
     
     private float[] stumpClassify(int dimension,float threshVal, String inequal) {
-        float[] retArrary = new float[trainingSetXY[0].length];
+        float[] retArrary = new float[trainingSetXY.length];
         if(inequal == "lt") {
-            for(int i=0;i<trainingSetXY[0].length;i++) {
+            for(int i=0;i<trainingSetXY.length;i++) {
                 if(trainingSetXY[i][dimension] <= threshVal) {
                     retArrary[i] = -1.0f;
                 }
             }
         }
         else {
-            for(int i=0;i<trainingSetXY[0].length;i++) {
+            for(int i=0;i<trainingSetXY.length;i++) {
                 if(trainingSetXY[i][dimension] > threshVal) {
                     retArrary[i] = 1.0f;
                 }
