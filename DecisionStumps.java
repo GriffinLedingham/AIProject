@@ -53,7 +53,7 @@ public class DecisionStumps {
                     else{inequal = "gt";}
                     
                     float threshValue = min+j * stepSize; //calculate threshold v
-                    float[] predictedValues = stumpClassify(i,threshVal,inequal); //predict labels
+                    float[] predictedValues = stumpClassify(i,threshValue,inequal); //predict labels
                     int[] errArray = new int[m];
                     for(int l=0;l<m;l++) { //initialize error array to all 1's
                         errArray[l] = 1;}
@@ -79,14 +79,14 @@ public class DecisionStumps {
     private float[] stumpClassify(int dimension,float threshVal, String inequal) {
         float[] retArrary = new float[trainingSetXY[0].length];
         if(inequal == "lt") {
-            for(int i=0;i<trainingSetXY.length;i++) {
+            for(int i=0;i<trainingSetXY[0].length;i++) {
                 if(trainingSetXY[i][dimension] <= threshVal) {
                     retArrary[i] = -1.0f;
                 }
             }
         }
         else {
-            for(int i=0;i<trainingSetXY.length;i++) {
+            for(int i=0;i<trainingSetXY[0].length;i++) {
                 if(trainingSetXY[i][dimension] > threshVal) {
                     retArrary[i] = 1.0f;
                 }
