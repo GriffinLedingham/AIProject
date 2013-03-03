@@ -146,7 +146,7 @@ public class DecisionStumps {
             {
                 if(trainingSetXY[dimension][i] > threshVal)
                 {
-                    retArrary[i] = 1.0f;
+                    retArrary[i] = -1.0f;
                 }
             }
         }
