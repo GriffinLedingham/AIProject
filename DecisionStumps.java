@@ -35,6 +35,32 @@ public class DecisionStumps {
 		}
 		
 	}
+    
+    private float[] stumpClassify(float dimension,float threshVal, String inequal)
+    {
+        float[][] retArrary = new float[trainingSetXY[0].length][1];
+        if(inequal == "lt")
+        {
+            for(int i=0;i<trainingSetXY.length;i++)
+            {
+                if(trainingSetXY[i][dimension] <= threshVal)
+                {
+                    retArrary[i] = -1.0;
+                }
+            }
+        }
+        else
+        {
+            for(int i=0;i<trainingSetXY.length;i++)
+            {
+                if(trainingSetXY[i][dimension] > threshVal)
+                {
+                    retArrary[i] = 1.0;
+                }
+            }
+        }
+        return retArrary;
+    }
 
 	private void parseInput(Scanner in)
 	{
