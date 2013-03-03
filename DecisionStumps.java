@@ -101,6 +101,7 @@ public class DecisionStumps {
                     if(weightedErr<minErr)
                     {
                         minErr = weightedErr;
+                        
                         bestClassEst = (float[])predictedValues.clone();
                         ret = new bestStump(i,threshValue,inequal);
                     }
@@ -109,6 +110,7 @@ public class DecisionStumps {
                      bestStump['dim'] = i
                      bestStump['thresh'] = threshVal
                      bestStump['ineq'] = inequal*/
+                    System.out.println("dim: " + i + ". thresh: " + threshValue + ". ineqal: " + inequal + ". The weighted error is " + weightedErr);
                 }
             }
 		}
