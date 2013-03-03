@@ -2,6 +2,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+class bestStump {
+    int dim;
+    float thresh;
+    String ineq;
+    
+    public bestStump(int iIn,float threshValueIn,String inequalIn)
+    {
+        dim = iIn;
+        thresh = threshValueIn;
+        ineq = inequalIn;
+    }
+    
+    public bestStump()
+    {
+        dim = 0;
+        thresh = 0.0f;
+        ineq = "";
+    }
+}
 
 public class DecisionStumps {
 	
@@ -28,13 +47,14 @@ public class DecisionStumps {
 		build(numIterations);
 	}
 	
-	private void build(int numIterations)
+	private bestStump build(int numIterations)
     {
 		int m = trainingSetSize;
         int n = trainingSetXY[0].length;
         float minErr = Float.POSITIVE_INFINITY;
         float numStep = 10.0f;
         float[] bestClassEst = new float[m];
+        bestStump ret = new bestStump();
         for(int i=0; i<m; i++)
         {
             bestClassEst[i]=0.0f;
@@ -82,6 +102,7 @@ public class DecisionStumps {
                     {
                         minErr = weightedErr;
                         bestClassEst = (float[])predictedValues.clone();
+                        ret = new bestStump(i,threshValue,inequal);
                     }
                     
                     /*
@@ -91,6 +112,7 @@ public class DecisionStumps {
                 }
             }
 		}
+        return ret;
         //return bestStump, bestClasEst, minErr; The fuck. I think we'll have trouble returning 3 values.
 		
 	}
