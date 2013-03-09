@@ -6,8 +6,8 @@ public class KernelPerceptron {
     
     //[height][width]
     private float[][] data;
-    private float[] y;
-    private int height,width;
+    private float[][] y;
+    private int height,widthx, widthy;
     
     PrintWriter debugOut;
     
@@ -58,19 +58,24 @@ public class KernelPerceptron {
     
 	private void parseInput(Scanner in)
 	{
-        width = in.nextInt();
+        widthx = in.nextInt();
+        widthy = in.nextInt();
         height = in.nextInt();
-        data = new float[height][width];
-        y = new float[height];
+        data = new float[height][widthx];
+        y = new float[height][widthy];
         
         for(int i = 0;i<height;i++)
         {
-            for(int j = 0;j<width;j++)
+            for(int j = 0;j<widthx;j++)
             {
                 data[i][j] = in.nextFloat();
                 //System.out.println(data[i][j]);
             }
-            y[i] = in.nextFloat();
+            for(int j = 0;j<widthy;j++)
+            {
+                y[i][j] = in.nextFloat();
+                System.out.println(y[i][j]);
+            }
         }
         
         normalizeInput();
@@ -78,8 +83,8 @@ public class KernelPerceptron {
 	
 	private void normalizeInput()
 	{
-		float max[] = new float[width];
-		float min[] = new float[width];
+		float max[] = new float[widthx];
+		float min[] = new float[widthx];
 		float maxy;
 		float miny;
 		miny = maxy = y[0];
@@ -94,8 +99,8 @@ public class KernelPerceptron {
 				if (min[i] > data[j][i]) min[i] = data[j][i];
 				if (max[i] < data[j][i]) max[i] = data[j][i];
 				
-				if (miny > y[j]) miny = y[j];
-				if (maxy < y[j]) maxy = y[j];
+				//if (miny > y[j]) miny = y[j];
+				//if (maxy < y[j]) maxy = y[j];
 			}
 			
 		}
@@ -117,11 +122,11 @@ public class KernelPerceptron {
 			}
 		}
 		
-		// normalize the classifications
+		/* normalize the classifications
 		for(int i = 0; i < height; i++)
 		{
 			y[i] = (y[i] - (maxy + miny)/2)/((maxy - miny)/2);
-		}
+		} */
 		
 	}
     
@@ -200,13 +205,16 @@ public class KernelPerceptron {
 				float sum = 0.0f;
 				for(int k=0;k<height;k++)
 				{
-					sum+= K[k][j]*c[k]*y[j];
+					sum+= K[k][j]*c[k];
 				}
-				if(sum <= 0)
+				for(int l = 0; l < widthy; l++)
 				{
-					c[j] += y[j];
-					misclassified = true;
-                    errCount++;
+					if(sum*y[j][l] <= 0)
+					{
+						c[j] += y[j][l];
+						misclassified = true;
+						errCount++;
+					}
 				}
                 
 				System.out.println("Itteration:" + count + " Sum:" + sum + " Missclassified:" + misclassified);
