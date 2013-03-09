@@ -11,7 +11,7 @@ public class KernelPerceptron {
     
 	public boolean debug = false;
 	
-	public float runPerceptron(String filename, int max_iterations)
+	public float runPerceptron(String filename, int max_iterations, int dimension, float minErr)
 	{
 		float testError;
 		
@@ -27,12 +27,11 @@ public class KernelPerceptron {
 		}
 		
 		// compute the kernel matrix
-		computeKernel();
+		computeKernel(dimension);
         
 		float[] c = new float[height];
-		//printClassification(c);
         
-        c= classify(max_iterations);
+        c= classify(max_iterations,minErr);
 		
 		printClassification(c);
 		
@@ -61,13 +60,13 @@ public class KernelPerceptron {
             for(int j = 0;j<width;j++)
             {
                 data[i][j] = in.nextFloat();
-                System.out.println(data[i][j]);
+                //System.out.println(data[i][j]);
             }
             y[i] = in.nextFloat();
         }
 	}
     
-	private void computeKernel()
+	private void computeKernel(int dimension)
     {
         K = new float[height][height];
         
@@ -81,7 +80,7 @@ public class KernelPerceptron {
                     dot += data[i][k]*data[j][k];
                 }
                 
-                K[j][i] = (float)Math.pow(1 + dot, width);
+                K[j][i] = (float)Math.pow(1 + dot, dimension);
             }
         }
     }
@@ -97,9 +96,25 @@ public class KernelPerceptron {
 		System.out.println();
 	}
     
-	private float[] classify(int max_iterations)
+    private float sign(float x)
+    {
+        if(x<0)
+            return -1.0f;
+        else if(x>0)
+            return 1.0f;
+        else
+            return 0.0f;
+    }
+    
+	private float[] classify(int max_iterations,float minErr)
 	{
 		int count = 0;
+        
+        int[] errArray = new int[height];
+        for(int i=0; i<height; i++) //initialize error array to all 1's
+        {
+            errArray[i] = 1;
+        }
         
 		// the classifier
 		float[] c = new float[height];
@@ -108,8 +123,11 @@ public class KernelPerceptron {
 		// loop control
 		boolean misclassified = true;
         
+        
+        float lastErr = 0.0f;
 		while(misclassified && (count < max_iterations))
 		{
+            int errCount=0;
 			count++;
 			misclassified = false;
 			for(int j=0;j<height;j++)
@@ -117,15 +135,36 @@ public class KernelPerceptron {
 				float sum = 0.0f;
 				for(int k=0;k<height;k++)
 				{
-					sum+= K[k][j]*c[k];
+					sum+= K[k][j]*c[k]*y[j];
 				}
-				if(sum*y[j] <= 0)
+				if(sum <= 0)
 				{
 					c[j] += y[j];
 					misclassified = true;
+                    errCount++;
 				}
+                
+                /*if(sign(sum) != sign(y[j]))
+                {
+                    //errArray[j]=0;
+                    
+                }*/
+                
+                
 			}
+            float currErr = (float)errCount/(float)height;
+            System.out.println("Iteration: "+count+", Error:"+currErr);
+            
+            //if(((float)errCount/(float)height) < minErr){}
+                //break;
+            
+            if(currErr <= minErr)
+            {
+                break;
+            }
 		}
+        if(count >= max_iterations)
+            System.out.println("broke early");
 		
 		return c;
 	}
