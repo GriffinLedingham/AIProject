@@ -8,6 +8,7 @@ public class KernelPerceptron {
 	private float[][] data;
 	private float[][] y;
 	private int height,widthx, widthy;
+	private float error;
 
 	PrintWriter debugOut;
 
@@ -15,8 +16,6 @@ public class KernelPerceptron {
 
 	public float runPerceptron(String filename, int max_iterations, int dimension, float minErr)
 	{
-		float testError;
-
 		try {
 			debugOut = new PrintWriter(new FileWriter("debug.txt"));
 		} catch (IOException e1) {
@@ -43,18 +42,6 @@ public class KernelPerceptron {
 
 		c= classify(max_iterations,minErr);
 
-		//printClassification(c);
-
-		testError = testError();
-
-		return testError;
-	}
-
-	private float testError()
-	{
-		float error = 0;
-		//TODO
-
 		return error;
 	}
 
@@ -71,12 +58,10 @@ public class KernelPerceptron {
 			for(int j = 0;j<widthx;j++)
 			{
 				data[i][j] = in.nextFloat();
-				System.out.println(data[i][j]);
 			}
 			for(int j = 0;j<widthy;j++)
 			{
 				y[i][j] = in.nextFloat();
-				System.out.println(y[i][j]);
 			}
 		}
 
@@ -100,12 +85,6 @@ public class KernelPerceptron {
 			}
 
 		}
-
-		System.out.print("Max X Un-normalized Value = " );
-		printArray(max);
-
-		System.out.print("Min X Un-normalized Value = ");
-		printArray(min);
 
 		// normalize the data
 		for(int i = 0; i < widthx; i++)
@@ -161,9 +140,7 @@ public class KernelPerceptron {
                     System.out.print(classifcation[i][l]);
                 }
             }
-            System.out.print("]");
-            System.out.println();
-
+            System.out.print("], ");
 		}
 	}
 
@@ -183,7 +160,6 @@ public class KernelPerceptron {
 		float[][] c = new float[height][widthy];
         for(int i=0;i<height;i++)
         {
-		//Arrays.fill(c[i], 0);
             for(int k=0;k<widthy;k++)
             {
                 c[i][k] = 0.0f;
@@ -222,19 +198,17 @@ public class KernelPerceptron {
                 if(misclass)
                     errCount++;
 				
-				//System.out.println("Itteration:" + count + " Sum:" + sum + " Missclassified:" + misclassified);
 			}
 
 			float currErr = (float)errCount/(float)height;
-			System.out.println("Iteration: "+count+", Error:"+currErr);
 			if(currErr <= minErr)
 			{
+				error = currErr;
 				break;
 			}
 			if(count >= max_iterations)
 				System.out.println("broke early");
 		}
-
 		return c;
 	}
 

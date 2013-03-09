@@ -45,14 +45,14 @@ public class DecisionStumps {
 	float[][] trainingSetXY;
 	int[] classLabels;
 	float[] weights;
-	int trainingSetRowSize;
-	int trainingSetColSize;
+	int trainingWidth;
+	int trainingHeight;
 
 	public float runDecisionStumps(String dataFilename, int numIterations)
 	{
 		// read in the samples
 		File infile = new File(dataFilename);
-		Scanner inData, inClass;
+		Scanner inData;
 		try {
 			inData = new Scanner(infile);
 			parseDataInput(inData);
@@ -72,8 +72,8 @@ public class DecisionStumps {
 
 	private BestStump build(int numIterations)
 	{
-		int m = trainingSetRowSize;
-		int n = trainingSetColSize;
+		int n = trainingWidth;
+		int m = trainingHeight;
 		float minErr = Float.POSITIVE_INFINITY;
 		float numStep = 10.0f;
 		float[] bestClassEst = new float[m];
@@ -91,10 +91,10 @@ public class DecisionStumps {
 			float max = trainingSetXY[0][i];
 			for(int j=0;j<m;j++)
 			{
-				if(trainingSetXY[i][j] < min) //find min value
-					min = trainingSetXY[i][j];
-				if(trainingSetXY[i][j] > max) //find max value
-					max = trainingSetXY[i][j];
+				if(trainingSetXY[j][i] < min) //find min value
+					min = trainingSetXY[j][i];
+				if(trainingSetXY[j][i] > max) //find max value
+					max = trainingSetXY[j][i];
 			}
 			float stepSize = (max-min)/numStep; //calculate step size
 			for(int j=-1;j<(int)numStep+1;j++)
@@ -124,7 +124,7 @@ public class DecisionStumps {
 					{
 						weightedErr += weights[l] * errArray[l];
 					}
-					System.out.println("dim: " + i + ". thresh: " + threshValue + ". ineqal: " + inequal + ". The weighted error is " + weightedErr);
+					//System.out.println("dim: " + i + ". thresh: " + threshValue + ". ineqal: " + inequal + ". The weighted error is " + weightedErr);
 					if(weightedErr<minErr)
 					{
 						minErr = weightedErr;
@@ -144,18 +144,18 @@ public class DecisionStumps {
 
 	private float[] stumpClassify(int dimension,float threshVal, String inequal)
 	{
-		float[] retArrary = new float[trainingSetRowSize];
+		float[] retArrary = new float[trainingHeight];
 		//Init with all ones
-		for(int i=0;i<trainingSetRowSize;i++)
+		for(int i=0;i<trainingHeight;i++)
 		{
 			retArrary[i] = 1.0f;
 		}
 
 		if(inequal == "lt")
 		{
-			for(int i=0;i<trainingSetRowSize;i++)
+			for(int i=0;i<trainingHeight;i++)
 			{
-				if(trainingSetXY[dimension][i] <= threshVal)
+				if(trainingSetXY[i][dimension] <= threshVal)
 				{
 					retArrary[i] = -1.0f;
 				}
@@ -163,9 +163,9 @@ public class DecisionStumps {
 		}
 		else
 		{
-			for(int i=0;i<trainingSetRowSize;i++)
+			for(int i=0;i<trainingHeight;i++)
 			{
-				if(trainingSetXY[dimension][i] > threshVal)
+				if(trainingSetXY[i][dimension] > threshVal)
 				{
 					retArrary[i] = -1.0f;
 				}
@@ -177,18 +177,23 @@ public class DecisionStumps {
 	private void parseDataInput(Scanner in)
 	{
 		int i = 0;
-		trainingSetRowSize = in.nextInt();
-		trainingSetColSize = in.nextInt();
-		trainingSetXY = new float[trainingSetColSize][trainingSetRowSize];
-		classLabels = new int[trainingSetRowSize];
+		trainingWidth = in.nextInt();
+		int classifierRowSize = in.nextInt();
+		trainingHeight = in.nextInt();
+		trainingSetXY = new float[trainingHeight][trainingWidth];
+		classLabels = new int[trainingHeight];
 
 		while(in.hasNext()){
-			for(int j=0; j<trainingSetColSize; j++)
+			for(int j=0; j<trainingWidth; j++)
 			{
-				trainingSetXY[j][i] = in.nextFloat();
+				trainingSetXY[i][j] = in.nextFloat();
+			}
+			classLabels[i] = in.nextInt();
+			for(int k=1; k<classifierRowSize; k++)
+			{
+				in.nextInt();
 			}
 			
-			classLabels[i] = in.nextInt();
 			i++;
 		}
 
@@ -197,10 +202,10 @@ public class DecisionStumps {
 
 	private void initWeights()
 	{
-		weights = new float[trainingSetRowSize];
-		for(int i=0; i<trainingSetRowSize; i++)
+		weights = new float[trainingHeight];
+		for(int i=0; i<trainingHeight; i++)
 		{
-			weights[i] = (float) (1.0/trainingSetRowSize);
+			weights[i] = (float) (1.0/trainingHeight);
 		}
 	}
 }
