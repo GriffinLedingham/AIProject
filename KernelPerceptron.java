@@ -71,15 +71,18 @@ public class KernelPerceptron {
     {
         K = new float[height][height];
         
+        //For all rows
         for(int i = 0; i < height; i++)
         {
+        	//Find the dot product between data[i] against every row in the matrix
             for(int j = 0; j < height; j++)
             {
-                float dot = 0.0f;
-                for(int k=0;k<width;k++)
-                {
-                    dot += data[i][k]*data[j][k];
-                }
+                float dot = 0;
+				try {
+					dot += dot(data[i], data[j]);
+				} catch (IllegalArgumentException e) {
+					System.out.println("Vectors aren't of the same size");
+				}
                 
                 K[j][i] = (float)Math.pow(1 + dot, width);
             }
@@ -128,6 +131,36 @@ public class KernelPerceptron {
 		}
 		
 		return c;
+	}
+	
+	private float dot(float[] v1, float[] v2)
+	{
+		int lengthV1 = v1.length;
+		int lengthV2 = v2.length;
+		float result = 0;
+		if(lengthV1 != lengthV2)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		for(int i=0; i<lengthV1; i++)
+		{
+			result += v1[i]*v2[i];
+		}
+		
+		return result;
+	}
+	
+	private float[] transposeRow(float[][] data, int colNum )
+	{
+		float[] result = new float[height];
+		
+		for(int i=0; i<height; i++)
+		{
+			result[i] = data[i][colNum];
+		}
+		
+		return result;
 	}
 }
 
