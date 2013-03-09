@@ -1,6 +1,6 @@
 
+
 public class TesterClass {
-	
 	KernelPerceptron kernelPerceptron = new KernelPerceptron();
 	DecisionStumps decisionStumps = new DecisionStumps();
 	int MAXDIMENSION = 10;
@@ -11,6 +11,7 @@ public class TesterClass {
 	
 	public void runAllTests()
 	{
+        
 		boolean result = testOne();
 		if(!result)
 		{
@@ -30,7 +31,7 @@ public class TesterClass {
 	{	
 		float testError = 0.0f;
 		
-		String file1 = "testData1.txt";
+		String file1 = "iris.txt";
 		//String file1 = in.readLine();
 		
 		System.out.println("Starting Kernel Perceptron Tests...");
@@ -49,7 +50,7 @@ public class TesterClass {
 			}
 		}
 		
-		String file2 = "testData2.txt";
+		String file2 = "fertility.txt";
 		//String file2 = in.readLine();
 		
 		System.out.println("Starting Kernel Perceptron Tests...");
@@ -75,7 +76,7 @@ public class TesterClass {
 	{
 		float testError = 0.0f;
 		
-		String file1 = "testData1.txt";
+		String file1 = "iris.txt";
 		//String file1 = in.readLine();
 		
 		System.out.println("Starting Decision Stumps Tests...");
@@ -93,7 +94,7 @@ public class TesterClass {
 			}
 		}
 		
-		String file2 = "testData2.txt";
+		String file2 = "fertility.txt";
 		//String file2 = in.readLine();
 		
 		System.out.println("Starting Decision Stumps Tests...");
@@ -118,8 +119,9 @@ public class TesterClass {
 	
 	public static void main(String[] args)
 	{
+        FileFormat ff = new FileFormat();
 		TesterClass tester = new TesterClass();
-		
+		ff.format();
 		tester.runAllTests();
         
 		return;
