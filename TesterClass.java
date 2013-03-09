@@ -14,7 +14,7 @@ public class TesterClass {
 	private void testOne()
 	{
 		float testError;
-		testError = kernelPerceptron.runPerceptron("iris.txt", 1000, 2, 0.02f);
+		testError = kernelPerceptron.runPerceptron("iris.txt", 10, 2, 0.002f);
 		//decisionStumps.runDecisionStumps("data.txt", "class.txt", 10);
 		//TODO
 	}
