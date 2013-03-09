@@ -48,7 +48,7 @@ public class DecisionStumps {
 	int trainingSetRowSize;
 	int trainingSetColSize;
 
-	public void runDecisionStumps(String dataFilename, String classFilename, int numIterations)
+	public float runDecisionStumps(String dataFilename, int numIterations)
 	{
 		// read in the samples
 		File infile = new File(dataFilename);
@@ -59,23 +59,15 @@ public class DecisionStumps {
 		} catch (FileNotFoundException e) {
 			System.out.println("error reading file");
 			e.printStackTrace();
-			return;
-		}
-		
-		File inClassFile = new File(classFilename);
-		try {
-			inClass = new Scanner(inClassFile);
-			parseClassInput(inClass);
-		} catch (FileNotFoundException e) {
-			System.out.println("error reading file");
-			e.printStackTrace();
-			return;
+			return -1;
 		}
 
 		initWeights();
 
 		BestStump stump = build(numIterations);
 		stump.printValues();
+		
+		return stump.weightedError;
 	}
 
 	private BestStump build(int numIterations)
@@ -188,24 +180,14 @@ public class DecisionStumps {
 		trainingSetRowSize = in.nextInt();
 		trainingSetColSize = in.nextInt();
 		trainingSetXY = new float[trainingSetColSize][trainingSetRowSize];
+		classLabels = new int[trainingSetRowSize];
 
 		while(in.hasNext()){
 			for(int j=0; j<trainingSetColSize; j++)
 			{
 				trainingSetXY[j][i] = in.nextFloat();
 			}
-			i++;
-		}
-
-		return;
-	}
-	
-	private void parseClassInput(Scanner in)
-	{
-		int i=0;
-		classLabels = new int[trainingSetRowSize];
-
-		while(in.hasNext()){
+			
 			classLabels[i] = in.nextInt();
 			i++;
 		}

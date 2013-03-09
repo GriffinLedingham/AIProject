@@ -38,12 +38,12 @@ public class KernelPerceptron {
 		// compute the kernel matrix
 		computeKernel(dimension);
 
-		float[] c = new float[height];
+		float[][] c = new float[height][widthy];
 		//printClassification(c);
 
 		c= classify(max_iterations,minErr);
 
-		printClassification(c);
+		//printClassification(c);
 
 		testError = testError();
 
@@ -143,18 +143,31 @@ public class KernelPerceptron {
 		print2DArrayFile(K);
 	}
 
-	private void printClassification(float[] classifcation)
+	private void printClassification(float[][] classifcation)
 	{
 		int i;
 		System.out.print("c = ");
 		for(i = 0; i < height; i++)
 		{
-			System.out.print(classifcation[i] + " ");
+            System.out.print("[");
+            for(int l=0;l<widthy;l++)
+            {
+                if(l!=0)
+                {
+                    System.out.print("," + classifcation[i][l]);
+                }
+                else
+                {
+                    System.out.print(classifcation[i][l]);
+                }
+            }
+            System.out.print("]");
+            System.out.println();
+
 		}
-		System.out.println();
 	}
 
-	private float[] classify(int max_iterations, float minErr)
+	private float[][] classify(int max_iterations, float minErr)
 	{
 		int count = 0;
 
@@ -167,8 +180,15 @@ public class KernelPerceptron {
 		float lastErr = 0.0f;
 
 		// the classifier
-		float[] c = new float[height];
-		Arrays.fill(c, 0);
+		float[][] c = new float[height][widthy];
+        for(int i=0;i<height;i++)
+        {
+		//Arrays.fill(c[i], 0);
+            for(int k=0;k<widthy;k++)
+            {
+                c[i][k] = 0.0f;
+            }
+        }
 
 		// loop control
 		boolean misclassified = true;
@@ -180,25 +200,32 @@ public class KernelPerceptron {
 			misclassified = false;
 			for(int j=0;j<height;j++)
 			{
-				float sum = 0.0f;
-				for(int k=0;k<height;k++)
-				{
-					sum+= K[k][j]*c[k];
-				}
+				
+                
+                boolean misclass = false;
 				for(int l = 0; l < widthy; l++)
 				{
+                    float sum = 0.0f;
+                    for(int k=0;k<height;k++)
+                    {
+                        sum+= K[k][j]*c[k][l];
+                    }
+                    
 					if(sum*y[j][l] <= 0)
 					{
-						c[j] += y[j][l];
+						c[j][l] += y[j][l];
 						misclassified = true;
-						errCount++;
+                        misclass = true;
 					}
 				}
+                
+                if(misclass)
+                    errCount++;
 				
-				System.out.println("Itteration:" + count + " Sum:" + sum + " Missclassified:" + misclassified);
+				//System.out.println("Itteration:" + count + " Sum:" + sum + " Missclassified:" + misclassified);
 			}
 
-			float currErr = (float)errCount/((float)height*(float)widthy);
+			float currErr = (float)errCount/(float)height;
 			System.out.println("Iteration: "+count+", Error:"+currErr);
 			if(currErr <= minErr)
 			{
