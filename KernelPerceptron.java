@@ -4,7 +4,7 @@ import java.util.*;
 public class KernelPerceptron {
 	//private int[] x;
 	//private int[] y;
-	//private float[][] K;
+	private float[][] K;
 	//private float[] K;
     
     //[height][width]
@@ -30,10 +30,10 @@ public class KernelPerceptron {
 		}
 		
 		// compute the kernel matrix
-		//computeKernel();
+		computeKernel();
         
 		float[] c = new float[height];
-		printClassification(c);
+		//printClassification(c);
         
         c= classify(max_iterations);
 		
@@ -82,7 +82,7 @@ public class KernelPerceptron {
          }*/
 	}
     
-	/*private void computeKernel()
+	private void computeKernel()
      {
      //if(debug) System.out.println("Kernel Matrix");
      //K = new float[height][width];
@@ -98,13 +98,13 @@ public class KernelPerceptron {
      dot += data[i][k]*data[j][k];
      }
      
-     K[j][i] = (float)Math.pow(1 + dot, 3);
+     K[j][i] = (float)Math.pow(1 + dot, width);
      //if(debug) System.out.print(K[i][j] + " ");
      }
      //if(debug) System.out.println();
      }
      
-     }*/
+     }
 	
 	private float sign(float x)
 	{
@@ -149,15 +149,15 @@ public class KernelPerceptron {
 				float sum = 0.0f;
 				for(int k=0;k<height;k++)
 				{
-					float dot = 0.0f;
+					/*float dot = 0.0f;
 	                
 					for(int g=0;g<width;g++)
 	                {
 	                    dot += data[j][g]*data[k][g];
 	                }
 					
-	                sum += (float)Math.pow(1 + dot, 3) * c[k];
-					//sum+= K[k][j]*c[k];
+	                sum += (float)Math.pow(1 + dot, power) * c[k];*/
+					sum+= K[k][j]*c[k];
                     
 				}
 				if(sum*y[j] <= 0)
