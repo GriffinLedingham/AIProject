@@ -2,14 +2,16 @@ import java.io.*;
 import java.util.*;
 
 public class KernelPerceptron {
-	private int[] x;
-	private int[] y;
 	private int[][] K;
 	private int num_samples;
+	float[][] trainingSetXY;
+	int[] classLabels;
+	int trainingSetRowSize;
+	int trainingSetColSize;
 
 	public boolean debug = false;
 	
-	public float runPerceptron(String filename, int max_iterations, int dimension)
+	public float runPerceptron(String dataFilename, String classFilename, int max_iterations, int dimension)
 	{
 		float testError;
 		
@@ -20,15 +22,26 @@ public class KernelPerceptron {
 		 */
 		
 		// read in the samples
-		File infile = new File(filename);
-		Scanner in;
-		try {
-			in = new Scanner(infile);
-			parseInput(in);
-		} catch (FileNotFoundException e) {
-			System.out.println("error reading file");
-			e.printStackTrace();
-		}
+			File infile = new File(dataFilename);
+			Scanner inData, inClass;
+			try {
+				inData = new Scanner(infile);
+				parseDataInput(inData);
+			} catch (FileNotFoundException e) {
+				System.out.println("error reading file");
+				e.printStackTrace();
+				return -1;
+			}
+			
+			File inClassFile = new File(classFilename);
+			try {
+				inClass = new Scanner(inClassFile);
+				parseClassInput(inClass);
+			} catch (FileNotFoundException e) {
+				System.out.println("error reading file");
+				e.printStackTrace();
+				return -1;
+			}
 		
 		// compute the kernel matrix
 		computeKernel(dimension);
@@ -50,18 +63,35 @@ public class KernelPerceptron {
 		return error;
 	}
 
-	private void parseInput(Scanner in)
+	private void parseDataInput(Scanner in)
 	{
-		num_samples = in.nextInt();
-		x = new int[num_samples];
-		y = new int[num_samples];
+		int i = 0;
+		trainingSetColSize = in.nextInt();
+		trainingSetRowSize = in.nextInt();
+		trainingSetXY = new float[trainingSetColSize][trainingSetRowSize];
 
-		if(debug) System.out.println("num samples: " + num_samples);
-		for(int i = 0; i < num_samples; i++)
-		{
-			x[i] = in.nextInt();
-			y[i] = in.nextInt();		
+		while(in.hasNext()){
+			for(int j=0; j<trainingSetColSize; j++)
+			{
+				trainingSetXY[j][i] = in.nextFloat();
+			}
+			i++;
 		}
+
+		return;
+	}
+	
+	private void parseClassInput(Scanner in)
+	{
+		int i=0;
+		classLabels = new int[trainingSetRowSize];
+
+		while(in.hasNext()){
+			classLabels[i] = in.nextInt();
+			i++;
+		}
+
+		return;
 	}
 
 	private void computeKernel(int dimension)
@@ -78,6 +108,13 @@ public class KernelPerceptron {
 			if(debug) System.out.println();
 		}
 
+	}
+	
+	private float computeDotProd(int dataindex, int classindex)
+	{
+		// need dot product of trainsetXY and classLabels
+		
+		
 	}
 	
 	private void printClassification(int[] classifcation)
