@@ -65,6 +65,49 @@ public class KernelPerceptron {
             }
             y[i] = in.nextFloat();
         }
+        
+        normalizeInput();
+	}
+	
+	private void normalizeInput()
+	{
+		float max[] = new float[width];
+		float min[] = new float[width];
+		float maxy;
+		float miny;
+		miny = maxy = y[0];
+		
+		// for each x attribute
+		for(int i = 0; i < width; i++)
+		{
+			min[i] = max[i] = data[0][i];
+			// find max and min
+			for(int j = 0; j < height; j++)
+			{
+				if (min[i] > data[j][i]) min[i] = data[j][i];
+				if (max[i] < data[j][i]) max[i] = data[j][i];
+				
+				if (miny > y[j]) miny = y[j];
+				if (maxy < y[j]) maxy = y[j];
+			}
+			
+		}
+		
+		// normalize the data
+		for(int i = 0; i < width; i++)
+		{
+			for(int j = 0; j < width; j++)
+			{
+				data[j][i] = (data[j][i] - (max[i] + min[i])/2)/((max[i] - min[i])/2);
+			}
+		}
+		
+		// normalize the classifications
+		for(int i = 0; i < height; i++)
+		{
+			y[i] = (y[i] - (maxy + miny)/2)/((maxy - miny)/2);
+		}
+		
 	}
     
 	private void computeKernel()
