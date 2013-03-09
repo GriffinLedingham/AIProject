@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.io.*;
 
 
 public class IrisFormat {
@@ -24,14 +25,18 @@ public class IrisFormat {
 		    stream.close();
 		  }
 		  
+          File f = new File("iris.txt");
 		  
-		  filetext.replaceAll("Iris-setosa", "-1 -1");
-		  filetext.replaceAll("Iris-versicolor", "-1 1");
-		  filetext.replaceAll("Iris-virginica", "1 -1");
-		  filetext.replaceAll(",", " ");
+		  filetext = filetext.replaceAll("Iris-setosa", "-1 -1");
+		  filetext = filetext.replaceAll("Iris-versicolor", "-1 1");
+		  filetext = filetext.replaceAll("Iris-virginica", "1 -1");
+		  filetext = filetext.replaceAll(",", " ");
 		  
-		  PrintWriter out = new PrintWriter("iris.txt");
-		  out.println("4 2 150");
-		  out.println(filetext);
+		  BufferedWriter out = new BufferedWriter(new FileWriter(f));
+		  out.write("4 2 150\n");
+		  out.write(filetext);
+          out.close();
+        
+        //System.out.println(filetext);
 	}
 }
