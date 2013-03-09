@@ -8,6 +8,8 @@ public class KernelPerceptron {
     private float[][] data;
     private float[][] y;
     private int height,widthx, widthy;
+
+    PrintWriter debugOut;
     
 	public boolean debug = false;
 	
@@ -173,6 +175,7 @@ public class KernelPerceptron {
 					{
 						c[j] += y[j][l];
 						misclassified = true;
+						errCount++;
 					}
 				}
 			}
