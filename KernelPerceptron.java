@@ -2,10 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class KernelPerceptron {
-	//private int[] x;
-	//private int[] y;
 	private float[][] K;
-	//private float[] K;
     
     //[height][width]
     private float[][] data;
@@ -54,17 +51,11 @@ public class KernelPerceptron {
     
 	private void parseInput(Scanner in)
 	{
-		//num_samples = in.nextInt();
         width = in.nextInt();
-        //System.out.println(width);
         height = in.nextInt();
-        //System.out.println(height);
         data = new float[height][width];
         y = new float[height];
-		//x = new int[num_samples];
-		//y = new int[num_samples];
         
-		//if(debug) System.out.println("num samples: " + num_samples);
         for(int i = 0;i<height;i++)
         {
             for(int j = 0;j<width;j++)
@@ -73,48 +64,27 @@ public class KernelPerceptron {
                 System.out.println(data[i][j]);
             }
             y[i] = in.nextFloat();
-            
         }
-		/*for(int i = 0; i < num_samples; i++)
-         {
-         x[i] = in.nextInt();
-         y[i] = in.nextInt();
-         }*/
 	}
     
 	private void computeKernel()
-     {
-     //if(debug) System.out.println("Kernel Matrix");
-     //K = new float[height][width];
-     K = new float[height][height];
-     
-     for(int i = 0; i < height; i++)
-     {
-     for(int j = 0; j < height; j++)
-     {
-     float dot = 0.0f;
-     for(int k=0;k<width;k++)
-     {
-     dot += data[i][k]*data[j][k];
-     }
-     
-     K[j][i] = (float)Math.pow(1 + dot, width);
-     //if(debug) System.out.print(K[i][j] + " ");
-     }
-     //if(debug) System.out.println();
-     }
-     
-     }
-	
-	private float sign(float x)
-	{
-		if(x<0.0f)
-			return -1.0f;
-		else if(x>0.0f)
-			return 1.0f;
-		else
-			return 0.0f;
-	}
+    {
+        K = new float[height][height];
+        
+        for(int i = 0; i < height; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                float dot = 0.0f;
+                for(int k=0;k<width;k++)
+                {
+                    dot += data[i][k]*data[j][k];
+                }
+                
+                K[j][i] = (float)Math.pow(1 + dot, width);
+            }
+        }
+    }
 	
 	private void printClassification(float[] classifcation)
 	{
@@ -129,8 +99,6 @@ public class KernelPerceptron {
     
 	private float[] classify(int max_iterations)
 	{
-		//int j, k;
-		//int sum;
 		int count = 0;
         
 		// the classifier
@@ -149,16 +117,7 @@ public class KernelPerceptron {
 				float sum = 0.0f;
 				for(int k=0;k<height;k++)
 				{
-					/*float dot = 0.0f;
-	                
-					for(int g=0;g<width;g++)
-	                {
-	                    dot += data[j][g]*data[k][g];
-	                }
-					
-	                sum += (float)Math.pow(1 + dot, power) * c[k];*/
 					sum+= K[k][j]*c[k];
-                    
 				}
 				if(sum*y[j] <= 0)
 				{
@@ -166,25 +125,7 @@ public class KernelPerceptron {
 					misclassified = true;
 				}
 			}
-			/*for(j=0; j < height; j++)
-             {
-             sum = 0;
-             for(k = 0; k < num_samples; k++)
-             {
-             sum += c[k]*K[k][j];
-             }
-             sum *= y[j];
-             
-             if(sum <= 0)
-             {
-             c[j] += y[j];
-             misclassified = true;
-             }
-             }*/
-            
 		}
-        
-		//System.out.println();
 		
 		return c;
 	}
