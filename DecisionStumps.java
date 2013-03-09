@@ -31,11 +31,12 @@ class BestStump {
 		System.out.println("Best Stump:");
 		System.out.println("Dimention: " + dim + ". ThresholdValue: " + thresh + ". Inequality: " + ineq + ". The weighted error is " + weightedError);
 		System.out.println("Best Classifier");
-		System.out.println(classif[0]);
+		System.out.print(classif[0]);
 		for(int i=1; i<classif.length; i++)
 		{
-			System.out.println(", " + classif[i]);
+			System.out.print(", " + classif[i]);
 		}
+		System.out.println("");
 	}
 }
 
@@ -184,8 +185,8 @@ public class DecisionStumps {
 	private void parseDataInput(Scanner in)
 	{
 		int i = 0;
-		trainingSetColSize = in.nextInt();
 		trainingSetRowSize = in.nextInt();
+		trainingSetColSize = in.nextInt();
 		trainingSetXY = new float[trainingSetColSize][trainingSetRowSize];
 
 		while(in.hasNext()){
