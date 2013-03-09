@@ -9,12 +9,20 @@ public class KernelPerceptron {
     private float[] y;
     private int height,width;
     
+    PrintWriter debugOut;
+    
 	public boolean debug = false;
 	
 	public float runPerceptron(String filename, int max_iterations)
 	{
 		float testError;
 		
+		try {
+			debugOut = new PrintWriter(new FileWriter("debug.txt"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		// read in the samples
 		File infile = new File(filename);
 		Scanner in;
@@ -61,7 +69,6 @@ public class KernelPerceptron {
             for(int j = 0;j<width;j++)
             {
                 data[i][j] = in.nextFloat();
-                System.out.println(data[i][j]);
             }
             y[i] = in.nextFloat();
         }
@@ -92,6 +99,14 @@ public class KernelPerceptron {
 			}
 			
 		}
+		System.out.print("Max X Un-normalized Value = " );
+		printArray(max);
+		
+		System.out.print("Min X Un-normalized Value = ");
+		printArray(min);
+		
+		System.out.println("Max Y Un-normalized Value = " + maxy);
+		System.out.println("Min Y Un-normalized Value = " + miny);
 		
 		// normalize the data
 		for(int i = 0; i < width; i++)
@@ -130,6 +145,9 @@ public class KernelPerceptron {
                 K[j][i] = (float)Math.pow(1 + dot, width);
             }
         }
+        
+       debugOut.println("Computed Kernel");
+       print2DArrayFile(K);
     }
 	
 	private void printClassification(float[] classifcation)
@@ -163,13 +181,15 @@ public class KernelPerceptron {
 				float sum = 0.0f;
 				for(int k=0;k<height;k++)
 				{
-					sum+= K[k][j]*c[k];
+					sum+= K[k][j]*c[k]*y[j];
 				}
-				if(sum*y[j] <= 0)
+				if(sum <= 0)
 				{
 					c[j] += y[j];
 					misclassified = true;
 				}
+				
+				System.out.println("Itteration:" + count + " Sum:" + sum + " Missclassified:" + misclassified);
 			}
 		}
 		
@@ -192,6 +212,39 @@ public class KernelPerceptron {
 		}
 		
 		return result;
+	}
+	
+	private void print2DArray(float[][] data)
+	{
+		for(int i=0; i<data.length; i++)
+		{
+			for(int j=0; j<data[i].length; j++)
+			{
+				System.out.print(data[i][j] + " ");
+			}
+			System.out.println("");
+		}
+	}
+	
+	private void print2DArrayFile(float[][] data)
+	{
+		for(int i=0; i<data.length; i++)
+		{
+			for(int j=0; j<data[i].length; j++)
+			{
+				debugOut.print(data[i][j] + " ");
+			}
+			debugOut.println("");
+		}
+	}
+	
+	private void printArray(float[] data)
+	{
+		for(int i=0; i<data.length; i++)
+		{
+			System.out.print(data[i] + " ");	
+		}
+		System.out.println("");
 	}
 	
 	private float[] transposeRow(float[][] data, int colNum )
