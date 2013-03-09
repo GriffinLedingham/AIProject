@@ -175,7 +175,7 @@ public class KernelPerceptron {
 					{
 						c[j] += y[j][l];
 						misclassified = true;
-						errCount++;
+						//errCount++;
 					}
 				}
 			}
