@@ -2,51 +2,40 @@ import java.io.*;
 import java.util.*;
 
 public class KernelPerceptron {
-	private int[][] K;
-	private int num_samples;
-	float[][] trainingSetXY;
-	int[] classLabels;
-	int trainingSetRowSize;
-	int trainingSetColSize;
-
+	//private int[] x;
+	//private int[] y;
+	//private float[][] K;
+	//private float[] K;
+    
+    //[height][width]
+    private float[][] data;
+    private float[] y;
+    private int height,width;
+    
 	public boolean debug = false;
 	
-	public float runPerceptron(String dataFilename, String classFilename, int max_iterations, int dimension)
+	public float runPerceptron(String filename, int max_iterations)
 	{
 		float testError;
 		
-		/* usage: java KernelPerceptron <inputfile> <max iterations> <kernel dimension>
-		 * <input file> txt file with number of samples as first line and every line following contains two ints, <x,y>
-		 * <max iterations> is the number of iterations the program should perform before giving up on classifying the samples
-		 * <kernel dimension> is the dimension mapped to
-		 */
-		
 		// read in the samples
-			File infile = new File(dataFilename);
-			Scanner inData, inClass;
-			try {
-				inData = new Scanner(infile);
-				parseDataInput(inData);
-			} catch (FileNotFoundException e) {
-				System.out.println("error reading file");
-				e.printStackTrace();
-				return -1;
-			}
-			
-			File inClassFile = new File(classFilename);
-			try {
-				inClass = new Scanner(inClassFile);
-				parseClassInput(inClass);
-			} catch (FileNotFoundException e) {
-				System.out.println("error reading file");
-				e.printStackTrace();
-				return -1;
-			}
+		File infile = new File(filename);
+		Scanner in;
+		try {
+			in = new Scanner(infile);
+			parseInput(in);
+		} catch (FileNotFoundException e) {
+			System.out.println("error reading file");
+			e.printStackTrace();
+		}
 		
 		// compute the kernel matrix
-		computeKernel(dimension);
-
-		int[] c = classify(max_iterations);
+		//computeKernel();
+        
+		float[] c = new float[height];
+		printClassification(c);
+        
+        c= classify(max_iterations);
 		
 		printClassification(c);
 		
@@ -62,108 +51,140 @@ public class KernelPerceptron {
 		
 		return error;
 	}
-
-	private void parseDataInput(Scanner in)
+    
+	private void parseInput(Scanner in)
 	{
-		int i = 0;
-		trainingSetColSize = in.nextInt();
-		trainingSetRowSize = in.nextInt();
-		trainingSetXY = new float[trainingSetColSize][trainingSetRowSize];
-
-		while(in.hasNext()){
-			for(int j=0; j<trainingSetColSize; j++)
-			{
-				trainingSetXY[j][i] = in.nextFloat();
-			}
-			i++;
-		}
-
-		return;
+		//num_samples = in.nextInt();
+        width = in.nextInt();
+        //System.out.println(width);
+        height = in.nextInt();
+        //System.out.println(height);
+        data = new float[height][width];
+        y = new float[height];
+		//x = new int[num_samples];
+		//y = new int[num_samples];
+        
+		//if(debug) System.out.println("num samples: " + num_samples);
+        for(int i = 0;i<height;i++)
+        {
+            for(int j = 0;j<width;j++)
+            {
+                data[i][j] = in.nextFloat();
+                System.out.println(data[i][j]);
+            }
+            y[i] = in.nextFloat();
+            
+        }
+		/*for(int i = 0; i < num_samples; i++)
+         {
+         x[i] = in.nextInt();
+         y[i] = in.nextInt();
+         }*/
+	}
+    
+	/*private void computeKernel()
+     {
+     //if(debug) System.out.println("Kernel Matrix");
+     //K = new float[height][width];
+     K = new float[height][height];
+     
+     for(int i = 0; i < height; i++)
+     {
+     for(int j = 0; j < height; j++)
+     {
+     float dot = 0.0f;
+     for(int k=0;k<width;k++)
+     {
+     dot += data[i][k]*data[j][k];
+     }
+     
+     K[j][i] = (float)Math.pow(1 + dot, 3);
+     //if(debug) System.out.print(K[i][j] + " ");
+     }
+     //if(debug) System.out.println();
+     }
+     
+     }*/
+	
+	private float sign(float x)
+	{
+		if(x<0.0f)
+			return -1.0f;
+		else if(x>0.0f)
+			return 1.0f;
+		else
+			return 0.0f;
 	}
 	
-	private void parseClassInput(Scanner in)
-	{
-		int i=0;
-		classLabels = new int[trainingSetRowSize];
-
-		while(in.hasNext()){
-			classLabels[i] = in.nextInt();
-			i++;
-		}
-
-		return;
-	}
-
-	private void computeKernel(int dimension)
-	{
-		if(debug) System.out.println("Kernel Matrix");
-		K = new int[num_samples][num_samples];
-		for(int i = 0; i < num_samples; i++)
-		{
-			for(int j = 0; j < num_samples; j++)
-			{
-				K[i][j] = (int) Math.pow(1 + x[i]*y[j], dimension);
-				if(debug) System.out.print(K[i][j] + " ");
-			}
-			if(debug) System.out.println();
-		}
-
-	}
-	
-	private float computeDotProd(int dataindex, int classindex)
-	{
-		// need dot product of trainsetXY and classLabels
-		
-		
-	}
-	
-	private void printClassification(int[] classifcation)
+	private void printClassification(float[] classifcation)
 	{
 		int i;
 		System.out.print("c = ");
-		for(i = 0; i < num_samples; i++)
+		for(i = 0; i < height; i++)
 		{
 			System.out.print(classifcation[i] + " ");
 		}
 		System.out.println();
 	}
-
-	private int[] classify(int max_iterations)
+    
+	private float[] classify(int max_iterations)
 	{
-		int j, k;
-		int sum;
+		//int j, k;
+		//int sum;
 		int count = 0;
-
+        
 		// the classifier
-		int[] c = new int[num_samples];
+		float[] c = new float[height];
 		Arrays.fill(c, 0);
-
+        
 		// loop control
 		boolean misclassified = true;
-
+        
 		while(misclassified && (count < max_iterations))
 		{
 			count++;
 			misclassified = false;
-			for(j=0; j < num_samples; j++)
+			for(int j=0;j<height;j++)
 			{
-				sum = 0;
-				for(k = 0; k < num_samples; k++)
+				float sum = 0.0f;
+				for(int k=0;k<height;k++)
 				{
-					sum += c[k]*K[k][j];	
+					float dot = 0.0f;
+	                
+					for(int g=0;g<width;g++)
+	                {
+	                    dot += data[j][g]*data[k][g];
+	                }
+					
+	                sum += (float)Math.pow(1 + dot, 3) * c[k];
+					//sum+= K[k][j]*c[k];
+                    
 				}
-				sum *= y[j];
-
-				if(sum <= 0)
+				if(sum*y[j] <= 0)
 				{
 					c[j] += y[j];
 					misclassified = true;
 				}
 			}
-
+			/*for(j=0; j < height; j++)
+             {
+             sum = 0;
+             for(k = 0; k < num_samples; k++)
+             {
+             sum += c[k]*K[k][j];
+             }
+             sum *= y[j];
+             
+             if(sum <= 0)
+             {
+             c[j] += y[j];
+             misclassified = true;
+             }
+             }*/
+            
 		}
-
-		System.out.println();		
+        
+		//System.out.println();
 		
 		return c;
 	}
