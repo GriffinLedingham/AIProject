@@ -41,15 +41,32 @@ public class FileFormat {
         
         
 		String filetext = "";
-		FileInputStream stream = new FileInputStream(new File("iris.data"));
+		FileInputStream stream = null;
+		try {
+			stream = new FileInputStream(new File("iris.data"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		  try {
-		    FileChannel fc = stream.getChannel();
-		    MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+		    MappedByteBuffer bb = null;
+			try {
+				FileChannel fc = stream.getChannel();
+				bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    /* Instead of using default, pass in a decoder. */
 		    filetext =  Charset.defaultCharset().decode(bb).toString();
 		  }
 		  finally {
-		    stream.close();
+		    try {
+				stream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		  }
 		  
           File f = new File("iris.txt");
@@ -59,31 +76,58 @@ public class FileFormat {
 		  filetext = filetext.replaceAll("Iris-virginica", "1 -1");
 		  filetext = filetext.replaceAll(",", " ");
 		  
-		  BufferedWriter out = new BufferedWriter(new FileWriter(f));
-		  out.write("4 2 150\n");
-		  out.write(filetext);
-          out.close();
+		  BufferedWriter out;
+		try {
+			out = new BufferedWriter(new FileWriter(f));
+			  out.write("4 2 150\n");
+			  out.write(filetext);
+			  out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         //==============================================================
           filetext = "";
-        stream = new FileInputStream(new File("fertility_Diagnosis.txt"));
+        try {
+			stream = new FileInputStream(new File("fertility_Diagnosis.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         try {
             FileChannel fc = stream.getChannel();
-            MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            MappedByteBuffer bb = null;
+			try {
+				bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             filetext =  Charset.defaultCharset().decode(bb).toString();
         }
         finally {
-		    stream.close();
+		    try {
+				stream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         
         f = new File("fertility.txt");
         
-        filetext = filetext.replaceAll("N", "-1.0");
-        filetext = filetext.replaceAll("O", "1.0");
+        filetext = filetext.replaceAll("N", "-1");
+        filetext = filetext.replaceAll("O", "1");
         filetext = filetext.replaceAll(",", " ");
         
-        out = new BufferedWriter(new FileWriter(f));
-        out.write("9 100\n");
-        out.write(filetext);
-        out.close();
+        try {
+			out = new BufferedWriter(new FileWriter(f));
+			out.write("9 1 100\n");
+			out.write(filetext);
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
