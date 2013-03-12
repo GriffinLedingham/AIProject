@@ -24,11 +24,13 @@ class SudokuClass:
 
         self.loadCNFFormula(cnfFormula)
         
+        
     def loadPuzzleMatrix(self, puzzleFilename):
         myFile = open(puzzleFilename, 'r')
         
         for line in myFile:
             string = line.replace('.', '0')
+            string = string.replace('\n', '')
             list = []
             for letter in string:
                 list.append(letter)
@@ -38,7 +40,8 @@ class SudokuClass:
         myFile = open(cnfFormula, 'r')
         
         for line in myFile:
-            print line
+            list = line.split(' ')
+            self.cnf.append(list[:-1])
         
         
         
