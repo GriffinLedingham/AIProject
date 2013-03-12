@@ -16,21 +16,24 @@ class SudokuClass:
         '''
         Constructor
         '''
+        pass
         
     
     def run(self, puzzleFilename, cnfFormula):
-        
         self.loadPuzzleMatrix(puzzleFilename)
 
-        
         self.loadCNFFormula(cnfFormula)
         
     def loadPuzzleMatrix(self, puzzleFilename):
         myFile = open(puzzleFilename, 'r')
         
         for line in myFile:
-            print line
-        
+            string = line.replace('.', '0')
+            list = []
+            for letter in string:
+                list.append(letter)
+            self.puzzleMat.append(list)
+                
     def loadCNFFormula(self, cnfFormula):
         myFile = open(cnfFormula, 'r')
         
