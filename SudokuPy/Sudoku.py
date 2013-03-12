@@ -33,7 +33,7 @@ class SudokuClass:
             string = string.replace('\n', '')
             list = []
             for letter in string:
-                list.append(letter)
+                list.append(int(letter))
             self.puzzleMat.append(list)
                 
     def loadCNFFormula(self, cnfFormula):
@@ -41,6 +41,7 @@ class SudokuClass:
         
         for line in myFile:
             list = line.split(' ')
+            list = map(int, list)
             self.cnf.append(list[:-1])
         
         
