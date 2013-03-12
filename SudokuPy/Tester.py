@@ -10,7 +10,12 @@ from Sudoku import SudokuClass
 class TesterClass:
     
     sudoku = SudokuClass()
-    sudoku.run("sudoku.txt", "cnf.txt")
     
     def __init__(self):
+        pass
         
+    def RunAllTests(self):
+        self.runTestOne()
+        
+    def runTestOne(self):
+        self.sudoku.run("sudoku.txt", "cnf.txt")
