@@ -20,6 +20,7 @@ local.properties
 *.mk
 debug.txt
 .DS_Store
+*.pyc
 
 # External tool builders
 .externalToolBuilders/
