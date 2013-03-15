@@ -30,11 +30,23 @@ class SudokuClass:
         
         for line in myFile:
             string = line.replace('.', '0')
+            string = string.replace('*', '0')
+            string = string.replace('?', '0')
             string = string.replace('\n', '')
             list = []
-            for letter in string:
-                list.append(int(letter))
-            self.puzzleMat.append(list)
+            length = len(string)
+            if length == 9:
+                for letter in string:
+                    list.append(int(letter))
+                self.puzzleMat.append(list)
+            else:
+                for x in range(0,9):
+                    list = []
+                    for y in range(0,9):
+                        list.append(int(string[9*x + y]))
+                    self.puzzleMat.append(list)
+                        
+            
                 
     def loadCNFFormula(self, cnfFormula):
         myFile = open(cnfFormula, 'r')
