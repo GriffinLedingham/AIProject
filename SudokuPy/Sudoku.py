@@ -79,7 +79,7 @@ class SudokuClass:
 
     #There is a nicer recursive implementation of this but it would make things a bit more obfuscated
     def unitPropagateList(self, clauseList, partialAssignment, literalList):
-        #Create a new dic that will hold all the true, false assignments
+        #partial assignment will hold all the true, false assignments
         #ie {!y, y or z, y or !z} --> y = false --> {true, false or z, false or !z} --> {z, !z} | literalAssignDic = {y:true}
                     
         #Keep going until all the unit clauses are resolved           
@@ -101,13 +101,50 @@ class SudokuClass:
             clauseList = self.removeUnitClause(unitClause, clauseList)
         return clauseList, partialAssignment, literalList
             
+    
+    def eliminateLiteral(self, clauseList, element, parity):
+        #must iterate over a copy to avoid weirdness
+        clauseListCopy = list(clauseList)
         
-    def onlyLiterals(self, clauseList):
-        #If it is only a single clause of literals
-        if len(clauseList) == 1:
-            #If that clause has no repeated values
-            if len(clauseList[0])!= len(set(clauseList[0])):
-                return True            
+        #positive unit clause
+        for clause in clauseListCopy:
+            for element in clause:
+                #Same polarity as unit clause
+                if element == element:
+                    #if the unit clause was negative
+                    if parity == False:
+                        #remove element
+                        clause = self.replaceWithFalse(element, clause)
+                        if clause == []:
+                            clauseList.remove(clause)
+                    #if the unit clause was positive    
+                    elif parity == True:
+                        #remove clause
+                        clauseList.remove(clause)
+                        break
+                #Negation of unit clause
+                if element == element*-1:
+                    if parity == False:
+                        #remove clause
+                        clauseList.remove(clause)
+                        break
+                    elif parity == True:
+                        #remove element
+                        clause = self.replaceWithFalse(element*-1, clause)
+                        if clause == []:
+                            clauseList.remove(clause)
+        return clauseList
+        
+    def partialInterp(self, clauseList, partialAssignment):
+        for element in partialAssignment:
+            if partialAssignment[element] == 'true':
+                clauseList = self.eliminateLiteral(clauseList, element, True)
+            if partialAssignment[element] == 'false':
+                clauseList = self.eliminateLiteral(clauseList, element, False)
+        #if its empty then the formula is equal to true with these partial assignments
+        if clauseList == []:
+            return True
+        #return false if not all the clauses have not been satisfied or there are still false's
         return False
     
     def hasEmptyClause(self):
@@ -119,6 +156,12 @@ class SudokuClass:
                 clause.remove(element)
         return clause
     
+    #FINISH THIS
+    def replaceWithFalse(literal, clause)
+        for element in clause:
+                if element == literal:
+                    clause.remove(element)
+        return clause
     def removeUnitClause(self, unitClause, clauseList):
         #must itterate over a copy to avoid weirdness
         clauseListCopy = list(clauseList)
@@ -210,10 +253,10 @@ class SudokuClass:
     #Create a new dic that will hold all the true, false assignments
     #ie {!y, y or z, y or !z} --> y = false --> {true, false or z, false or !z} --> {z, !z} | literalAssignDic = {y:true}
     def DPLL(self, clauseList, partialAssignment,  literalList):
-        if self.onlyLiterals(clauseList):
+        if self.partialInterp(clauseList, partialAssignment):
             return True
-        #if literalList.empty():
-            #return False
+        if self.partialInterp(self.negate(clauseList), partialAssignment)
+            return False
         
         clauseList, partialAssignment, literalList = self.unitPropagateList(clauseList, partialAssignment, literalList)
         
