@@ -22,8 +22,7 @@ class SudokuClass:
     
     def run(self, puzzleFilename, cnfFormula, outputFilename):
         
-        
-        testData = [[-1, 3, 4], [-2, 6, 4], [-2, -6, -3], [-4, -2], [2, -3, -1], [2, 6, 3], [2, -6, -4], [1, 5], [1, 6], [-6, 3, -5], [1, -3, -5]]
+        testData = [[-1, 3, 4], [-2, 6, 4], [-2, -6, -3], [-4, -2], [2, -3, -1], [2, 6, 3], [2, -6, -4], [1, 5], [1, 6], [-6, 3, -5], [1, -3, -5] , [-1, -2], [1]]
         literals = [1, 2, 3, 4, 5, 6]
         
         self.DPLL(testData, {}, literals)
@@ -57,7 +56,7 @@ class SudokuClass:
                     for y in range(0,9):
                         list.append(int(string[9*x + y]))
                     self.puzzleMat.append(list)
-                               
+    
                 
     def loadCNFFormula(self, cnfFormula):
         myFile = open(cnfFormula, 'r')
@@ -138,6 +137,7 @@ class SudokuClass:
     def partialInterp(self, clauseList, partialAssignment):
         for element in partialAssignment:
             if partialAssignment[element] == 'true':
+                #Should this be passing in the corresponding literal to the input partialAssignment? Assuming partial assignment follows the style {true,false,true..... etc.}
                 clauseList = self.eliminateLiteral(clauseList, element, True)
             if partialAssignment[element] == 'false':
                 clauseList = self.eliminateLiteral(clauseList, element, False)
@@ -157,10 +157,10 @@ class SudokuClass:
         return clause
     
     #FINISH THIS
-    def replaceWithFalse(literal, clause)
+    def replaceWithFalse(literal, clause):
         for element in clause:
-                if element == literal:
-                    clause.remove(element)
+            if element == literal:
+                   clause.remove(element)
         return clause
     def removeUnitClause(self, unitClause, clauseList):
         #must itterate over a copy to avoid weirdness
@@ -247,16 +247,14 @@ class SudokuClass:
                     if literal in clause or literal*-1 in clause:
                         clauseList.remove(clause)
         return clauseList, partialAssignmnet, literalList                       
-        
-
+    
     
     #Create a new dic that will hold all the true, false assignments
     #ie {!y, y or z, y or !z} --> y = false --> {true, false or z, false or !z} --> {z, !z} | literalAssignDic = {y:true}
     def DPLL(self, clauseList, partialAssignment,  literalList):
+        #Should this be passing in a listof the used literals to compare against the partialAssignment?
         if self.partialInterp(clauseList, partialAssignment):
             return True
-        if self.partialInterp(self.negate(clauseList), partialAssignment)
-            return False
         
         clauseList, partialAssignment, literalList = self.unitPropagateList(clauseList, partialAssignment, literalList)
         
@@ -272,6 +270,7 @@ class SudokuClass:
             return True
         if(self.DPLL(negList, partialAssignment, literalList)):
             return True
+    
         return False    
     
     def encodeMinimal(self, outputFileName):
