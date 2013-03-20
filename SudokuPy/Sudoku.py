@@ -20,7 +20,6 @@ class SudokuClass:
         '''
         pass
     
-    
     def run(self, puzzleFilename, cnfFormula, outputFilename):        
         self.loadPuzzleMatrix(puzzleFilename)
 
@@ -54,7 +53,7 @@ class SudokuClass:
                     for y in range(0,9):
                         list.append(int(string[9*x + y]))
                     self.puzzleMat.append(list)
-                               
+    
                 
     def loadCNFFormula(self, cnfFormula):
         myFile = open(cnfFormula, 'r')
@@ -63,6 +62,7 @@ class SudokuClass:
             list = line.split(' ')
             list = map(int, list)
             self.cnf.append(list[:-1])                    
+
     
     def encodeMinimal(self, outputFileName):
         myFile = open('minimal' + outputFileName, 'w')
@@ -176,12 +176,12 @@ class SudokuClass:
                 myFile.write('\n')
                 
         # each number appears at least once in each 3x3 sub-grid
-        for i in range(0,3):
-            for j in range(0,3):
-                for x in range(1,4):
-                    for y in range(1,4):
-                        for z in range(1,10):
-                            myFile.write(str((3*i+x)*100 + (3*j+y)*10 + z) + ' ')
-                        myFile.write('\n')
+        for z in range(1,10):
+            for i in range(0,3):
+                for j in range(0,3):
+                    for x in range(1,4):
+                        for y in range(1,4):
+                                myFile.write(str((3*i+x)*100 + (3*j+y)*10 + z) + ' ')
+            myFile.write('\n')
                     
         
