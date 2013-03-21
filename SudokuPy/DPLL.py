@@ -104,9 +104,17 @@ class DPLL(object):
                 clauseListCopy = self.eliminateLiteral(clauseListCopy, key, False)
         #if its empty then the formula is equal to true with these partial assignments
         if clauseListCopy == []:
-            return True
-        #return false if not all the clauses have not been satisfied or there are still false's
-        return False
+            return 'true'
+        if [0] in clauseListCopy:
+            return 'false'
+        #return false if not all the clauses have not been satisfied
+        return 'unassigned'
+    
+    def onlyFalse(self, clauseList):
+        for clause in clauseList:
+            if clause != [0]:
+                return False
+        return True
     
     def removeLiteralFromClause(self, literal, clause):
         for element in clause:
@@ -127,9 +135,9 @@ class DPLL(object):
     def removeUnitClause(self, unitClause, clauseList):
         #must itterate over a copy to avoid weirdness
         clauseListCopy = list(clauseList)
-        
+        clauseKillList = []
         #positive unit clause
-        for clause in clauseListCopy:
+        for i, clause in enumerate(clauseListCopy):
             for element in clause:
                 #Same polarity as unit clause
                 if element == unitClause:
@@ -138,23 +146,27 @@ class DPLL(object):
                         #remove element
                         clause = self.removeLiteralFromClause(unitClause, clause)
                         if clause == []:
-                            clauseList.remove(clause)
+                            clauseKillList.append(i)
                     #if the unit clause was positive    
                     elif unitClause > 0:
                         #remove clause
-                        clauseList.remove(clause)
+                        clauseKillList.append(i)
                         break
                 #Negation of unit clause
                 if element == unitClause*-1:
                     if unitClause < 0:
                         #remove clause
-                        clauseList.remove(clause)
+                        clauseKillList.append(i)
                         break
                     elif unitClause > 0:
                         #remove element
                         clause = self.removeLiteralFromClause(unitClause*-1, clause)
                         if clause == []:
-                            clauseList.remove(clause)
+                            clauseKillList.append(i)
+                            
+        clauseKillList.reverse()
+        for i in clauseKillList:
+            del clauseList[i]
         return clauseList
     
     #Return True if unit clause found in the list
@@ -220,9 +232,10 @@ class DPLL(object):
         return negatedList
     
     def runBacktracking(self, clauseList, partialAssignment,  literalList):
-        if self.partialInterp(clauseList, partialAssignment):
+        result = self.partialInterp(clauseList, partialAssignment)
+        if result == 'true':
             return True
-        if self.partialInterp(self.negateList(clauseList), partialAssignment):
+        if result == 'false':
             return False
         
         chosenLiteral = self.chooseLiteral(partialAssignment, literalList)
