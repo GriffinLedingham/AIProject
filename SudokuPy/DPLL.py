@@ -16,47 +16,12 @@ class DPLL(object):
         Constructor
         '''
         pass
-        
-    def tests(self):        
-        testData = [[-1, 3, 4], [-2, 6, 4], [-2, -6, -3], [-4, -2], [2, -3, -1], [2, 6, 3], [2, -6, -4], [1, 5], [1, 6], [-6, 3, -5], [1, -3, -5]]
-        literals = [1, 2, 3, 4, 5, 6]
-        
-        self.DPLL(testData, {}, literals)
-        
-    #Return 0 if none found
-    #Else return the value of the first encountered clause
-    def findNextUnitClause(self, clauseList):
-        #Search the clauseList for a clause with only one element.. Def of a unit clause
-        for clause in clauseList:
-            if(len(clause) == 1):
-                return clause[0]
-        #If no value return 0, since 0 cant be a literal <no negation>
-        return 0
+
     
-    #There is a nicer recursive implementation of this but it would make things a bit more obfuscated
-    def unitPropagateList(self, clauseList, partialAssignment, literalList):
-        #partial assignment will hold all the true, false assignments
-        #ie {!y, y or z, y or !z} --> y = false --> {true, false or z, false or !z} --> {z, !z} | literalAssignDic = {y:true}
-        clauseListCopy = copy.deepcopy(clauseList)
-        literalListCopy = copy.deepcopy(literalList)            
-        #Keep going until all the unit clauses are resolved           
-        while(True):
-            unitClause = self.findNextUnitClause(clauseListCopy)
-            #if 0 then no more unit clauses
-            if unitClause == 0 or len(clauseListCopy) == 0:
-                return clauseListCopy, partialAssignment, literalListCopy
-            #if positive then add as true value
-            elif unitClause > 0:
-                partialAssignment[unitClause] = 'true'
-                literalListCopy.remove(unitClause)
-            #if negative assign as false value
-            else:
-                partialAssignment[unitClause*-1] = 'false'
-                literalListCopy.remove(unitClause*-1)
-            
-            #remove the unit clause from all the other clauses
-            clauseListCopy = self.removeUnitClause(unitClause, clauseListCopy)
-        return clauseListCopy, partialAssignment, literalListCopy
+    def assignUnassignedLiterals(self, partialAssignment, literalList):
+        for literal in literalList:
+            partialAssignment[literal] = 'true'
+            literalList.remove(literal)
     
     def eliminateLiteral(self, clauseList, literal, parity):
         #must itterate over a copy to avoid weirdness
@@ -71,7 +36,7 @@ class DPLL(object):
                     #if the unit clause was negative
                     if parity == False:
                         #remove element
-                        clause = self.removeLiteralFromClause(literal, clauseList[i])
+                        self.removeLiteralFromClause(literal, clauseList[i])
                         if clause == []:
                             clauseKillList.append(i)
                     #if the unit clause was positive    
@@ -87,35 +52,27 @@ class DPLL(object):
                         break
                     elif parity == True:
                         #remove element
-                        clause = self.removeLiteralFromClause(literal*-1, clauseList[i])
+                        self.removeLiteralFromClause(literal*-1, clauseList[i])
                         if clause == []:
                             clauseKillList.append(i)
                             
         clauseKillList.reverse()
         for i in clauseKillList:
             del clauseList[i]
-        return clauseList
     
     def partialInterp(self, clauseList, partialAssignment):
-        clauseListCopy = copy.deepcopy(clauseList)
         for key, item in partialAssignment.iteritems():
             if item == 'true':
-                clauseListCopy = self.eliminateLiteral(clauseListCopy, key, True)
+                self.eliminateLiteral(clauseList, key, True)
             if item == 'false':
-                clauseListCopy = self.eliminateLiteral(clauseListCopy, key, False)
+                self.eliminateLiteral(clauseList, key, False)
         #if its empty then the formula is equal to true with these partial assignments
-        if clauseListCopy == []:
+        if clauseList == []:
             return 'true'
-        if [0] in clauseListCopy:
+        if [0] in clauseList:
             return 'false'
         #return false if not all the clauses have not been satisfied
         return 'unassigned'
-    
-    def onlyFalse(self, clauseList):
-        for clause in clauseList:
-            if clause != [0]:
-                return False
-        return True
     
     def removeLiteralFromClause(self, literal, clause):
         for element in clause:
@@ -123,13 +80,48 @@ class DPLL(object):
                 if len(clause) == 1:
                     clause.remove(element)
                     clause.append(0)
-                    return clause
+                    return
                 clause.remove(element)
-        return clause
+        return
     
+    
+    #Return 0 if none found
+    #Else return the value of the first encountered clause
+    def findNextUnitClause(self, clauseList):
+        #Search the clauseList for a clause with only one element.. Def of a unit clause
+        for clause in clauseList:
+            if(len(clause) == 1):
+                return clause[0]
+        #If no value return 0, since 0 cant be a literal <no negation>
+        return 0
+    
+        
+    #There is a nicer recursive implementation of this but it would make things a bit more obfuscated
+    def unitPropagateList(self, clauseList, partialAssignment, literalList):
+          
+        #Keep going until all the unit clauses are resolved           
+        while(True):
+            unitClause = self.findNextUnitClause(clauseList)
+            #if 0 then no more unit clauses
+            if unitClause == 0 or len(clauseList) == 0:
+                return
+            #if positive then add as true value
+            elif unitClause > 0:
+                partialAssignment[unitClause] = 'true'
+                literalList.remove(unitClause)
+            #if negative assign as false value
+            else:
+                partialAssignment[unitClause*-1] = 'false'
+                literalList.remove(unitClause*-1)
+            
+            #remove the unit clause from all the other clauses
+            self.removeUnitClause(unitClause, clauseList)
+        return  
+    
+      
     def removeUnitClause(self, unitClause, clauseList):
         #must itterate over a copy to avoid weirdness
-        clauseListCopy = list(clauseList)
+        clauseListCopy = copy.deepcopy(clauseList)
         clauseKillList = []
         #positive unit clause
         for i, clause in enumerate(clauseListCopy):
@@ -142,14 +134,14 @@ class DPLL(object):
                 #Negation of unit clause
                 if element == unitClause*-1:
                     #remove element
-                    clause = self.removeLiteralFromClause(unitClause*-1, clauseList[i])
+                    self.removeLiteralFromClause(unitClause*-1, clauseList[i])
                     if clause == []:
                         clauseKillList.append(i)
                             
         clauseKillList.reverse()
         for i in clauseKillList:
             del clauseList[i]
-        return clauseList
+        return
     
     #Return True if unit clause found in the list
     #Return False if no unit clause
@@ -161,6 +153,15 @@ class DPLL(object):
         #Return false if no Unit clause found
         return False
     
+    
+    def removePureFromList(self, literal, clauseList):
+        clauseListCopy = copy.deepcopy(clauseList)
+        
+        for clause in clauseListCopy:
+            if literal in clause:
+                clauseList.remove(clause)    
+                
+                
     def pureLiteral(self, element, clauseList):
         firstElementSeen = 0
         for clause in clauseList:
@@ -184,10 +185,10 @@ class DPLL(object):
         return None
     
     def pureLiteralAssignList(self, clauseList, partialAssignmnet, literalList):
-        #must iterate over clause list copy to avoid weirdness
-        clauseListCopy = copy.deepcopy(clauseList)
+        #must iterate over literal list copy to avoid weirdness
+        literalListCopy = copy.deepcopy(literalList)
         
-        for literal in literalList:
+        for literal in literalListCopy:
             #A pure literal is a literal with all the same polarity(negated or not negated)
             #in the whole clause list
             result, pureLiteral = self.pureLiteral(literal, clauseList)
@@ -199,19 +200,8 @@ class DPLL(object):
                     partialAssignmnet[literal] = 'false'
                     literalList.remove(literal)
                 #If we find a pureLiteral remove the whole clause from the clauseList that contains the pure literal
-                for clause in clauseListCopy:
-                    if literal in clause or literal*-1 in clause:
-                        clauseList.remove(clause)
-        return clauseList, partialAssignmnet, literalList 
-    
-    def negateList(self, clauseList):
-        negatedList = []
-        for clause in clauseList:
-            literalList = []
-            for literal in clause:
-                literalList.append(literal*-1)
-            negatedList.append(literalList)
-        return negatedList
+                self.removePureFromList(pureLiteral, clauseList)
+        return
     
     def runBacktracking(self, clauseList, partialAssignment,  literalList):
         result = self.partialInterp(clauseList, partialAssignment)
@@ -233,32 +223,34 @@ class DPLL(object):
         return False 
     
     def runDPLL(self, clauseList, partialAssignment,  literalList):
-        tempPA = copy.deepcopy(partialAssignment)
-        newClause = self.findNextUnitClause(clauseList)
-        if newClause > 0:
-            tempPA[newClause] = 'true'
-        else:
-            tempPA[newClause] = 'false'
-        result = self.partialInterp(clauseList, tempPA)
+        result = self.partialInterp(clauseList, partialAssignment)
         if result == 'true':
+            self.assignUnassignedLiterals(partialAssignment, literalList)
             return True
         if result == 'false':
             return False
         
-        clauseList, partialAssignment, literalList = self.unitPropagateList(clauseList, partialAssignment, literalList)
+        self.unitPropagateList(clauseList, partialAssignment, literalList)
         if [0] in clauseList:
             return False
         
-        clauseList, partialAssignment, literalList = self.pureLiteralAssignList(clauseList, partialAssignment, literalList)
+        self.pureLiteralAssignList(clauseList, partialAssignment, literalList)
+        if clauseList == []:
+            self.assignUnassignedLiterals(partialAssignment, literalList)
+            return True        
         
         chosenLiteral = self.chooseLiteral(partialAssignment, literalList)
         
-        posList = list(clauseList)
-        posList.append([chosenLiteral])
-        negList = list(clauseList)
-        negList.append([chosenLiteral*-1])
-        if(self.runDPLL(posList, partialAssignment, literalList)):
+        posDict = dict(partialAssignment)
+        posDict[chosenLiteral] = 'true'
+        
+        negDict = dict(partialAssignment)
+        negDict[chosenLiteral] = 'false'
+        
+        literalList.remove(chosenLiteral)
+        
+        if(self.runDPLL(copy.deepcopy(clauseList), posDict, list(literalList))):
             return True
-        if(self.runDPLL(negList, partialAssignment, literalList)):
+        if(self.runDPLL(copy.deepcopy(clauseList), negDict, list(literalList))):
             return True
         return False 

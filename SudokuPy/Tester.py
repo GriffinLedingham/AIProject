@@ -30,6 +30,7 @@ class TesterClass:
         self.testBackTracking()
         self.testUP()
         self.testPureL()
+        self.testDPLL()
         
         
         self.runTestOne()
@@ -79,25 +80,35 @@ class TesterClass:
     def testUP(self):
         testData = [[2, 1], [-1], [-2, -3], [3, 1]]
         testLiterals = [1, 2, 3]
-        clauseList, partialAssignment, literalList = self.dpllTester.unitPropagateList(testData, {}, testLiterals)
-        if clauseList != [[0]]:
+        partial = {}
+        self.dpllTester.unitPropagateList(testData, partial, testLiterals)
+        if testData != [[0]]:
             print "Error"
             
         testData = [[-1], [-1, 2], [1, -2], [2, -3], [1, 3]]
-        clauseList, partialAssignment, literalList = self.dpllTester.unitPropagateList(testData, {}, testLiterals)
-        if clauseList != [[0]]:
+        testLiterals = [1, 2, 3]
+        partial = {}
+        self.dpllTester.unitPropagateList(testData, partial, testLiterals)
+        if testData != [[0]]:
             print "Error"
         
     def testPureL(self):
         testData = [[1, -2, -3], [1, 3], [2, -3]]
         dataLit = [1, 2, 3]
-        clauseList, dic, literals = self.dpllTester.pureLiteralAssignList(testData, {}, dataLit)
-        if dic[1] != 'true':
+        partial = {}
+        self.dpllTester.pureLiteralAssignList(testData, partial, dataLit)
+        if partial[1] != 'true':
             print "error"
-        if dic[2] != 'true':
+        if partial[2] != 'true':
             print "error"
-        if dic[3] != 'false':
-            print"error"
+            
+    def testDPLL(self):
+        testData = [[-1, 3, 4], [-2, 6, 4], [-2, -6, -3], [-4, -2], [2, -3, -1], [2, 6, 3], [2, -6, -4], [1, 5], [1, 6], [-6, 3, -5], [1, -3, -5]]
+        dataLit = [1, 2, 3, 4, 5, 6]
+        partial = {}
+        result = self.dpllTester.runDPLL(testData, partial, dataLit)
+        if result == True:
+            print "Error"        
         
     def runTestOne(self):
         self.sudoku1.run("sudoku1.txt", "cnf.txt", "sat1.txt")
