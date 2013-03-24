@@ -37,25 +37,26 @@ class DPLL(object):
     def unitPropagateList(self, clauseList, partialAssignment, literalList):
         #partial assignment will hold all the true, false assignments
         #ie {!y, y or z, y or !z} --> y = false --> {true, false or z, false or !z} --> {z, !z} | literalAssignDic = {y:true}
-                    
+        clauseListCopy = copy.deepcopy(clauseList)
+        literalListCopy = copy.deepcopy(literalList)            
         #Keep going until all the unit clauses are resolved           
         while(True):
-            unitClause = self.findNextUnitClause(clauseList)
+            unitClause = self.findNextUnitClause(clauseListCopy)
             #if 0 then no more unit clauses
-            if unitClause == 0 or len(clauseList) == 0:
-                return clauseList, partialAssignment, literalList
+            if unitClause == 0 or len(clauseListCopy) == 0:
+                return clauseListCopy, partialAssignment, literalListCopy
             #if positive then add as true value
             elif unitClause > 0:
                 partialAssignment[unitClause] = 'true'
-                literalList.remove(unitClause)
+                literalListCopy.remove(unitClause)
             #if negative assign as false value
             else:
                 partialAssignment[unitClause*-1] = 'false'
-                literalList.remove(unitClause*-1)
+                literalListCopy.remove(unitClause*-1)
             
             #remove the unit clause from all the other clauses
-            clauseList = self.removeUnitClause(unitClause, clauseList)
-        return clauseList, partialAssignment, literalList
+            clauseListCopy = self.removeUnitClause(unitClause, clauseListCopy)
+        return clauseListCopy, partialAssignment, literalListCopy
     
     def eliminateLiteral(self, clauseList, literal, parity):
         #must itterate over a copy to avoid weirdness
@@ -70,7 +71,7 @@ class DPLL(object):
                     #if the unit clause was negative
                     if parity == False:
                         #remove element
-                        clause = self.removeLiteralFromClauseNoFalse(literal, clauseList[i])
+                        clause = self.removeLiteralFromClause(literal, clauseList[i])
                         if clause == []:
                             clauseKillList.append(i)
                     #if the unit clause was positive    
@@ -86,7 +87,7 @@ class DPLL(object):
                         break
                     elif parity == True:
                         #remove element
-                        clause = self.removeLiteralFromClauseNoFalse(literal*-1, clauseList[i])
+                        clause = self.removeLiteralFromClause(literal*-1, clauseList[i])
                         if clause == []:
                             clauseKillList.append(i)
                             
@@ -119,12 +120,6 @@ class DPLL(object):
     def removeLiteralFromClause(self, literal, clause):
         for element in clause:
             if element == literal:
-                clause.remove(element)
-        return clause
-    
-    def removeLiteralFromClauseNoFalse(self, literal, clause):
-        for element in clause:
-            if element == literal:
                 if len(clause) == 1:
                     clause.remove(element)
                     clause.append(0)
@@ -141,28 +136,15 @@ class DPLL(object):
             for element in clause:
                 #Same polarity as unit clause
                 if element == unitClause:
-                    #if the unit clause was negative
-                    if unitClause < 0:
-                        #remove element
-                        clause = self.removeLiteralFromClause(unitClause, clause)
-                        if clause == []:
-                            clauseKillList.append(i)
-                    #if the unit clause was positive    
-                    elif unitClause > 0:
-                        #remove clause
-                        clauseKillList.append(i)
-                        break
+                    #remove clause
+                    clauseKillList.append(i)
+                    break
                 #Negation of unit clause
                 if element == unitClause*-1:
-                    if unitClause < 0:
-                        #remove clause
+                    #remove element
+                    clause = self.removeLiteralFromClause(unitClause*-1, clauseList[i])
+                    if clause == []:
                         clauseKillList.append(i)
-                        break
-                    elif unitClause > 0:
-                        #remove element
-                        clause = self.removeLiteralFromClause(unitClause*-1, clause)
-                        if clause == []:
-                            clauseKillList.append(i)
                             
         clauseKillList.reverse()
         for i in clauseKillList:
@@ -251,12 +233,21 @@ class DPLL(object):
         return False 
     
     def runDPLL(self, clauseList, partialAssignment,  literalList):
-        if self.partialInterp(clauseList, partialAssignment):
+        tempPA = copy.deepcopy(partialAssignment)
+        newClause = self.findNextUnitClause(clauseList)
+        if newClause > 0:
+            tempPA[newClause] = 'true'
+        else:
+            tempPA[newClause] = 'false'
+        result = self.partialInterp(clauseList, tempPA)
+        if result == 'true':
             return True
-        if self.partialInterp(self.negateList(clauseList), partialAssignment):
+        if result == 'false':
             return False
         
         clauseList, partialAssignment, literalList = self.unitPropagateList(clauseList, partialAssignment, literalList)
+        if [0] in clauseList:
+            return False
         
         clauseList, partialAssignment, literalList = self.pureLiteralAssignList(clauseList, partialAssignment, literalList)
         

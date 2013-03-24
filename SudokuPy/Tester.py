@@ -73,14 +73,23 @@ class TesterClass:
             
         testData = [[2, 1], [-1], [-2, -3], [3, 1]]
         result = self.dpllTester.runBacktracking(testData, {}, testLiterals)
-        if result == False:
+        if result == True:
             print "Error"
             
     def testUP(self):
-        pass
+        testData = [[2, 1], [-1], [-2, -3], [3, 1]]
+        testLiterals = [1, 2, 3]
+        clauseList, partialAssignment, literalList = self.dpllTester.unitPropagateList(testData, {}, testLiterals)
+        if clauseList != [[0]]:
+            print "Error"
+            
+        testData = [[-1], [-1, 2], [1, -2], [2, -3], [1, 3]]
+        clauseList, partialAssignment, literalList = self.dpllTester.unitPropagateList(testData, {}, testLiterals)
+        if clauseList != [[0]]:
+            print "Error"
         
     def testPureL(self):
-        testData = [[1, -2, -3, [1, 3], [2, -3]]]
+        testData = [[1, -2, -3], [1, 3], [2, -3]]
         dataLit = [1, 2, 3]
         clauseList, dic, literals = self.dpllTester.pureLiteralAssignList(testData, {}, dataLit)
         if dic[1] != 'true':
