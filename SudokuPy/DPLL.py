@@ -22,14 +22,33 @@ class DPLL(object):
         for literal in literalList:
             partialAssignment[literal] = 'true'
             literalList.remove(literal)
+            
+    def printAssignment(self, partialAssignment):
+        countCol = 0
+        countRow = 0
+        string = ''
+        for key, item in partialAssignment.iteritems():
+            if item == 'true':
+                countCol += 1
+                string += str(key%10) + ' '
+                if countCol%3 == 0 and countCol != 9:
+                    string += '|'
+                if countCol == 9:
+                    print string
+                    string = ''
+                    countCol = 0
+                    countRow += 1
+                    if countRow%3 == 0 and countRow != 9:
+                        print "-"*20
+                
+    
     
     def eliminateLiteral(self, clauseList, literal, parity):
         #must itterate over a copy to avoid weirdness
-        clauseListCopy = copy.deepcopy(clauseList)
         clauseKillList = []
         
         #positive unit clause
-        for i, clause in enumerate(clauseListCopy):
+        for i, clause in enumerate(clauseList):
             for element in clause:
                 #Same polarity as unit clause
                 if element == literal:
@@ -121,10 +140,9 @@ class DPLL(object):
       
     def removeUnitClause(self, unitClause, clauseList):
         #must itterate over a copy to avoid weirdness
-        clauseListCopy = copy.deepcopy(clauseList)
         clauseKillList = []
         #positive unit clause
-        for i, clause in enumerate(clauseListCopy):
+        for i, clause in enumerate(clauseList):
             for element in clause:
                 #Same polarity as unit clause
                 if element == unitClause:
@@ -155,11 +173,14 @@ class DPLL(object):
     
     
     def removePureFromList(self, literal, clauseList):
-        clauseListCopy = copy.deepcopy(clauseList)
-        
-        for clause in clauseListCopy:
+        clauseKillList = []        
+        for i, clause in enumerate(clauseList):
             if literal in clause:
-                clauseList.remove(clause)    
+                clauseKillList.append(i)
+                
+        clauseKillList.reverse()        
+        for element in clauseKillList:
+            del clauseList[element]
                 
                 
     def pureLiteral(self, element, clauseList):
@@ -216,9 +237,9 @@ class DPLL(object):
         posDict[chosenLiteral] = 'true'
         negDict = dict(partialAssignment)
         negDict[chosenLiteral] = 'false'
-        if(self.runBacktracking(clauseList, posDict, literalList)):
+        if(self.runBacktracking(copy.deepcopy(clauseList), posDict, list(literalList))):
             return True
-        if(self.runBacktracking(clauseList, negDict, literalList)):
+        if(self.runBacktracking(copy.deepcopy(clauseList), negDict, list(literalList))):
             return True
         return False 
     
@@ -226,6 +247,7 @@ class DPLL(object):
         result = self.partialInterp(clauseList, partialAssignment)
         if result == 'true':
             self.assignUnassignedLiterals(partialAssignment, literalList)
+            self.printAssignment(partialAssignment)
             return True
         if result == 'false':
             return False
@@ -237,6 +259,7 @@ class DPLL(object):
         self.pureLiteralAssignList(clauseList, partialAssignment, literalList)
         if clauseList == []:
             self.assignUnassignedLiterals(partialAssignment, literalList)
+            self.printAssignment(partialAssignment)
             return True        
         
         chosenLiteral = self.chooseLiteral(partialAssignment, literalList)
