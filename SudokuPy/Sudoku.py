@@ -41,7 +41,6 @@ class SudokuClass:
             print "Didn't find encoding using minimal"
         else:
             print "Found encoding using minimal"
-            return
         
         
         clauseList = self.encodeExtended(outputFilename)
