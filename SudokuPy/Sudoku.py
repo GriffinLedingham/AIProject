@@ -4,6 +4,7 @@ Created on Mar 12, 2013
 @author: stryder
 '''
 from DPLL import DPLL
+from time import time, clock
 
 class SudokuClass:
     '''
@@ -23,7 +24,7 @@ class SudokuClass:
     def run(self, puzzleFilename, outputFilename):        
         dpll = DPLL()
         print ""
-        print "/"*6 + "NEW SUDOKU PUZZLE - USING DPLL" + "/"*6
+        print "/"*10 + "NEW SUDOKU PUZZLE - USING DPLL" + "/"*10
         print "Unsolved Puzzle:"
         self.loadPuzzleMatrix(puzzleFilename)
         self.printPuzzle()
@@ -31,17 +32,25 @@ class SudokuClass:
         literals = self.loadLiteralList()
         clauseList = self.encodeMinimal(outputFilename)
         print ""
-        print "Solved Puzzle:"        
+        print "-"*40
+        print "Solved Puzzle Using MINIMAL Encoding:"
+        t0 = clock()        
         result = dpll.runDPLL(clauseList, {}, list(literals))
+        print "Elapsed Time:" +  str(clock() - t0)
         if result == False:
             print "Didn't find encoding using minimal"
         else:
             print "Found encoding using minimal"
             return
         
-        clauseList = self.encodeExtended(outputFilename)
         
-        dpll.runDPLL(clauseList, {}, list(literals))
+        clauseList = self.encodeExtended(outputFilename)
+        print ""
+        print "-"*40
+        print "Solved Puzzle Using EXTENDED Encoding:"
+        t0 = clock()
+        result = dpll.runDPLL(clauseList, {}, list(literals))
+        print "Elapsed Time:" +  str(clock() - t0)
         if result == False:
             print "Didn't find encoding using extended"
             print "No Solution found...."

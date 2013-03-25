@@ -159,4 +159,6 @@ class TesterClass:
         self.sudoku8.run("sudoku8.txt", "sat8.txt")
 
     def runTestNine(self):
+        print "!!!!!!!!!!!!!!!!!!!!! WARNING THIS TEST CAN TAKE A VERY VERY LONG TIME!!!!!!!!!!!!!!!!!!!!!!!!!"
+        print "WE HAVE SEEN IT FINISH USING THE EXTENDED ENCODING"
         self.sudoku9.run("sudoku9.txt", "sat9.txt")
