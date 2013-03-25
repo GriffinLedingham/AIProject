@@ -6,6 +6,7 @@ Created on Mar 12, 2013
 
 from Sudoku import SudokuClass
 from DPLL import DPLL
+from multiprocessing import Queue
 
 class TesterClass:
     
@@ -73,22 +74,25 @@ class TesterClass:
     def testBackTracking(self):
         testData = [[-1, -2], [1, -2], [-1, -3]]
         testLiterals = [1, 2, 3]
-        result = self.dpllTester.runBacktracking(testData, {}, testLiterals)
-        if result == False:
+        queue0 = Queue()
+        self.dpllTester.runBacktracking(testData, {}, testLiterals, queue0)
+        if queue0.get() == False:
             print "Error"
         else:
             print "Passed Test 4"
-            
+        
+        queue1 = Queue()    
         testData = [[-1, -2], [-1, 2], [1, -2], [2, -3], [1, 3]]
-        result = self.dpllTester.runBacktracking(testData, {}, testLiterals)
-        if result == True:
+        self.dpllTester.runBacktracking(testData, {}, testLiterals, queue1)
+        if queue1.get() == True:
             print "Error"
         else:
             print "Passed Test 5"
-            
+        
+        queue2 = Queue()    
         testData = [[2, 1], [-1], [-2, -3], [3, 1]]
-        result = self.dpllTester.runBacktracking(testData, {}, testLiterals)
-        if result == True:
+        self.dpllTester.runBacktracking(testData, {}, testLiterals, queue2)
+        if queue2.get() == True:
             print "Error"
         else:
             print "Passed Test 6"
@@ -128,8 +132,9 @@ class TesterClass:
         testData = [[-1, 3, 4], [-2, 6, 4], [-2, -6, -3], [-4, -2], [2, -3, -1], [2, 6, 3], [2, -6, -4], [1, 5], [1, 6], [-6, 3, -5], [1, -3, -5]]
         dataLit = [1, 2, 3, 4, 5, 6]
         partial = {}
-        result = self.dpllTester.runDPLL(testData, partial, dataLit)
-        if result == True:
+        queue0 = Queue()
+        self.dpllTester.runDPLL(testData, partial, dataLit, queue0)
+        if queue0.get() == True:
             print "Error"
         else:
             print "Passed Test 10"        

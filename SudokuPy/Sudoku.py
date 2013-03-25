@@ -5,6 +5,7 @@ Created on Mar 12, 2013
 '''
 from DPLL import DPLL
 from time import time, clock
+from multiprocessing import Queue
 
 class SudokuClass:
     '''
@@ -31,26 +32,28 @@ class SudokuClass:
         
         literals = self.loadLiteralList()
         clauseList = self.encodeMinimal(outputFilename)
+        queue0 = Queue()
         print ""
         print "-"*40
         print "Solved Puzzle Using MINIMAL Encoding:"
         t0 = clock()        
-        result = dpll.runDPLL(clauseList, {}, list(literals))
+        dpll.runDPLL(clauseList, {}, list(literals), queue0)
         print "Elapsed Time:" +  str(clock() - t0)
-        if result == False:
+        if queue0.get() == False:
             print "Didn't find encoding using minimal"
         else:
             print "Found encoding using minimal"
         
         
         clauseList = self.encodeExtended(outputFilename)
+        queue1 = Queue()
         print ""
         print "-"*40
         print "Solved Puzzle Using EXTENDED Encoding:"
         t0 = clock()
-        result = dpll.runDPLL(clauseList, {}, list(literals))
+        dpll.runDPLL(clauseList, {}, list(literals), queue1)
         print "Elapsed Time:" +  str(clock() - t0)
-        if result == False:
+        if queue1.get() == False:
             print "Didn't find encoding using extended"
             print "No Solution found...."
         else:

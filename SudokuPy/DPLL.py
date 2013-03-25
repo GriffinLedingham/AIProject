@@ -4,6 +4,8 @@ Created on Mar 19, 2013
 @author: stryder
 '''
 import copy
+from threading import Thread
+from multiprocessing import Queue
 
 class DPLL(object):
     '''
@@ -15,7 +17,7 @@ class DPLL(object):
         '''
         Constructor
         '''
-        pass
+        self.COMPLETED = False
 
     
     def assignUnassignedLiterals(self, partialAssignment, literalList):
@@ -224,12 +226,14 @@ class DPLL(object):
                 self.removePureFromList(pureLiteral, clauseList)
         return
     
-    def runBacktracking(self, clauseList, partialAssignment,  literalList):
+    def runBacktracking(self, clauseList, partialAssignment,  literalList, queue):
         result = self.partialInterp(clauseList, partialAssignment)
         if result == 'true':
-            return True
+            queue.put(True)
+            return
         if result == 'false':
-            return False
+            queue.put(False)
+            return
         
         chosenLiteral = self.chooseLiteral(partialAssignment, literalList)
         
@@ -237,30 +241,53 @@ class DPLL(object):
         posDict[chosenLiteral] = 'true'
         negDict = dict(partialAssignment)
         negDict[chosenLiteral] = 'false'
-        if(self.runBacktracking(copy.deepcopy(clauseList), posDict, list(literalList))):
-            return True
-        if(self.runBacktracking(copy.deepcopy(clauseList), negDict, list(literalList))):
-            return True
-        return False 
+        
+        q1 = Queue()
+        q2 = Queue()
+        thread1 = Thread(target=self.runBacktracking, args=(copy.deepcopy(clauseList), posDict, list(literalList), q1))
+        thread1.start()
+        thread2 = Thread(target=self.runBacktracking, args=(copy.deepcopy(clauseList), negDict, list(literalList), q2))
+        thread2.start()
+        thread1.join()
+        thread2.join()
+        
+        if(q1.get()):
+            queue.put(True)
+            return
+        if(q2.get()):
+            queue.put(True)
+            return
+        queue.put(False)
+        return
     
-    def runDPLL(self, clauseList, partialAssignment,  literalList):
+    def runDPLL(self, clauseList, partialAssignment,  literalList, queue):
+        #some other thread beat you to it :(
+        if self.COMPLETED == True:
+            queue.put(False)
+            return
         result = self.partialInterp(clauseList, partialAssignment)
         if result == 'true':
             self.assignUnassignedLiterals(partialAssignment, literalList)
             self.printAssignment(partialAssignment)
-            return True
+            queue.put(True)
+            self.COMPLETED = True
+            return
         if result == 'false':
-            return False
+            queue.put(False)
+            return
         
         self.unitPropagateList(clauseList, partialAssignment, literalList)
         if [0] in clauseList:
-            return False
+            queue.put(False)
+            return
         
         self.pureLiteralAssignList(clauseList, partialAssignment, literalList)
         if clauseList == []:
             self.assignUnassignedLiterals(partialAssignment, literalList)
             self.printAssignment(partialAssignment)
-            return True        
+            queue.put(True)
+            self.COMPLETED = True
+            return       
         
         chosenLiteral = self.chooseLiteral(partialAssignment, literalList)
         
@@ -272,8 +299,20 @@ class DPLL(object):
         
         literalList.remove(chosenLiteral)
         
-        if(self.runDPLL(copy.deepcopy(clauseList), posDict, list(literalList))):
-            return True
-        if(self.runDPLL(copy.deepcopy(clauseList), negDict, list(literalList))):
-            return True
-        return False 
+        q1 = Queue()
+        q2 = Queue()
+        thread1 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), posDict, list(literalList), q1))
+        thread1.start()
+        thread2 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), negDict, list(literalList), q2))
+        thread2.start()
+        thread1.join()
+        thread2.join()
+        
+        if(q1.get()):
+            queue.put(True)
+            return
+        if(q2.get()):
+            queue.put(True)
+            return
+        queue.put(False)
+        return
