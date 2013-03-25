@@ -44,7 +44,7 @@ class SudokuClass:
         else:
             print "Found encoding using minimal"
         
-        
+        dpll = DPLL()
         clauseList = self.encodeExtended(outputFilename)
         queue1 = Queue()
         print ""

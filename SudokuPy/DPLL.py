@@ -18,6 +18,7 @@ class DPLL(object):
         Constructor
         '''
         self.COMPLETED = False
+        self.currentThreads = 0
 
     
     def assignUnassignedLiterals(self, partialAssignment, literalList):
@@ -298,15 +299,24 @@ class DPLL(object):
         negDict[chosenLiteral] = 'false'
         
         literalList.remove(chosenLiteral)
-        
-        q1 = Queue()
-        q2 = Queue()
-        thread1 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), posDict, list(literalList), q1))
-        thread1.start()
-        thread2 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), negDict, list(literalList), q2))
-        thread2.start()
-        thread1.join()
-        thread2.join()
+        if self.currentThreads < 10:
+            q1 = Queue()
+            q2 = Queue()
+            thread1 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), posDict, list(literalList), q1))
+            self.currentThreads += 1
+            thread1.start()
+            thread2 = Thread(target=self.runDPLL, args=(copy.deepcopy(clauseList), negDict, list(literalList), q2))
+            thread2.start()
+            self.currentThreads += 1
+            thread1.join()
+            thread2.join()
+            self.currentThreads -= 1
+            self.currentThreads -= 1
+        else:
+            q1 = Queue()
+            q2 = Queue()
+            self.runDPLL(copy.deepcopy(clauseList), posDict, list(literalList), q1)
+            self.runDPLL(copy.deepcopy(clauseList), negDict, list(literalList), q2)
         
         if(q1.get()):
             queue.put(True)
