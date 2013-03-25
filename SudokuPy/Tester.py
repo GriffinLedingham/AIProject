@@ -153,9 +153,11 @@ class TesterClass:
         self.sudoku6.run("sudoku6.txt", "sat6.txt")
 
     def runTestSeven(self):
+        print "!!!!!!!!!!!!!!!!!!!!! WARNING THIS TEST CAN TAKE A LONG TIME!!!!!!!!!!!!!!!!!!!!!!!!!"
         self.sudoku7.run("sudoku7.txt", "sat7.txt")
 
     def runTestEight(self):
+        print "!!!!!!!!!!!!!!!!!!!!! WARNING THIS TEST CAN TAKE A LONG TIME!!!!!!!!!!!!!!!!!!!!!!!!!"
         self.sudoku8.run("sudoku8.txt", "sat8.txt")
 
     def runTestNine(self):
